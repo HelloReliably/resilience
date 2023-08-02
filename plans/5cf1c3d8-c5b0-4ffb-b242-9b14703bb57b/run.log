@@ -1,0 +1,88 @@
+[2023-08-02T15:16:25.540345+00:00 INFO] [plan:263] ################################################################################
+[2023-08-02T15:16:25.540489+00:00 INFO] [plan:264] Starting Reliably experiment: https://app.reliably.com/api/v1/organization/8b5fddfd-1da8-4586-934b-f184f0ef7904/experiments/70eec69b-1848-4a87-93bb-d0e2c3a0014a/raw
+[2023-08-02T15:16:25.873890+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-08-02T15:16:25.874040+00:00 DEBUG] [caching:35] Cached 1 activities
+[2023-08-02T15:16:25.874157+00:00 INFO] [experiment:58] Validating the experiment's syntax
+[2023-08-02T15:16:25.874215+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-08-02T15:16:25.874287+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-08-02T15:16:25.874340+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-08-02T15:16:26.034849+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'validate_control'
+[2023-08-02T15:16:26.034965+00:00 INFO] [experiment:109] Experiment looks valid
+[2023-08-02T15:16:26.035010+00:00 DEBUG] [caching:42] Clearing activities cache
+[2023-08-02T15:16:26.035082+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-08-02T15:16:26.035124+00:00 DEBUG] [caching:35] Cached 1 activities
+[2023-08-02T15:16:26.035231+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-08-02T15:16:26.035308+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-08-02T15:16:26.035348+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-08-02T15:16:26.035386+00:00 DEBUG] [configuration:160] Loading dynamic configuration...
+[2023-08-02T15:16:26.035473+00:00 INFO] [run:369] Running experiment: Performs a range of checks on the certificate of a remote endpoint
+[2023-08-02T15:16:26.037290+00:00 DEBUG] [__init__:64] Initializing controls
+[2023-08-02T15:16:26.037387+00:00 DEBUG] [__init__:73] Initializing control 'reliably'
+[2023-08-02T15:16:26.037450+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-08-02T15:16:26.037556+00:00 DEBUG] [experiment:423] Configure Reliably's experiment control
+[2023-08-02T15:16:26.037734+00:00 DEBUG] [experiment:587] Sending plan '5cf1c3d8-c5b0-4ffb-b242-9b14703bb57b' status: running
+[2023-08-02T15:16:26.803642+00:00 INFO] [experiment:202] Reliably execution: 298347d5-5153-4acb-868b-a68203322bb1
+[2023-08-02T15:16:27.089700+00:00 DEBUG] [experiment:612] Sending execution state: {'current': 'running', 'started_on': '2023-08-02T15:16:26.037596+00:00', 'plan_id': '5cf1c3d8-c5b0-4ffb-b242-9b14703bb57b'}
+[2023-08-02T15:16:27.424975+00:00 DEBUG] [experiment:81] Starting Reliably state checker now
+[2023-08-02T15:16:27.425094+00:00 INFO] [run:396] Steady-state strategy: default
+[2023-08-02T15:16:27.426091+00:00 INFO] [run:400] Rollbacks strategy: always
+[2023-08-02T15:16:27.426342+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'experiment'
+[2023-08-02T15:16:27.426599+00:00 DEBUG] [python:196] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-08-02T15:16:27.426965+00:00 DEBUG] [run:558] Running steady-state hypothesis before the method
+[2023-08-02T15:16:27.427217+00:00 INFO] [hypothesis:186] Steady state hypothesis: Verify the conditions of your system
+[2023-08-02T15:16:27.427476+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'hypothesis'
+[2023-08-02T15:16:27.427746+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_hypothesis_control'
+[2023-08-02T15:16:27.428054+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-02T15:16:27.428294+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-02T15:16:27.428820+00:00 INFO] [activity:215] Probe: verify-certificate
+[2023-08-02T15:16:27.931065+00:00 DEBUG] [python:33] Activity 'verify-certificate' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/tls/probes.py'
+[2023-08-02T15:16:28.115989+00:00 DEBUG] [tolerances:29] Cert expires on 2023-10-23T07:40:10
+[2023-08-02T15:16:28.116174+00:00 DEBUG] [activity:235]   => succeeded with 'True'
+[2023-08-02T15:16:28.477395+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-02T15:16:28.477838+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-02T15:16:28.478138+00:00 DEBUG] [hypothesis:226] allowed tolerance is True
+[2023-08-02T15:16:28.478410+00:00 INFO] [hypothesis:236] Steady state hypothesis is met!
+[2023-08-02T15:16:28.478678+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'hypothesis'
+[2023-08-02T15:16:28.478919+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_hypothesis_control'
+[2023-08-02T15:16:28.479217+00:00 INFO] [run:679] Playing your experiment's method now...
+[2023-08-02T15:16:28.479472+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'method'
+[2023-08-02T15:16:28.479706+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_method_control'
+[2023-08-02T15:16:28.479971+00:00 INFO] [activity:133] No declared activities, let's move on.
+[2023-08-02T15:16:28.480212+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'method'
+[2023-08-02T15:16:28.480437+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_method_control'
+[2023-08-02T15:16:28.480709+00:00 DEBUG] [run:598] Running steady-state hypothesis after the method
+[2023-08-02T15:16:28.480972+00:00 INFO] [hypothesis:186] Steady state hypothesis: Verify the conditions of your system
+[2023-08-02T15:16:28.481221+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'hypothesis'
+[2023-08-02T15:16:28.481464+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_hypothesis_control'
+[2023-08-02T15:16:28.481751+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-02T15:16:28.482021+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-02T15:16:28.482300+00:00 INFO] [activity:215] Probe: verify-certificate
+[2023-08-02T15:16:28.857023+00:00 DEBUG] [python:33] Activity 'verify-certificate' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/tls/probes.py'
+[2023-08-02T15:16:28.940933+00:00 DEBUG] [tolerances:29] Cert expires on 2023-10-23T07:40:10
+[2023-08-02T15:16:28.941111+00:00 DEBUG] [activity:235]   => succeeded with 'True'
+[2023-08-02T15:16:29.265006+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-02T15:16:29.265190+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-02T15:16:29.265257+00:00 DEBUG] [hypothesis:226] allowed tolerance is True
+[2023-08-02T15:16:29.265315+00:00 INFO] [hypothesis:236] Steady state hypothesis is met!
+[2023-08-02T15:16:29.265392+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'hypothesis'
+[2023-08-02T15:16:29.265447+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_hypothesis_control'
+[2023-08-02T15:16:29.265518+00:00 WARNING] [run:722] Rollbacks were explicitly requested to be played
+[2023-08-02T15:16:29.265568+00:00 INFO] [run:959] Let's rollback...
+[2023-08-02T15:16:29.265631+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'rollback'
+[2023-08-02T15:16:29.265683+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_rollback_control'
+[2023-08-02T15:16:29.265730+00:00 INFO] [rollback:31] No declared rollbacks, let's move on.
+[2023-08-02T15:16:29.265789+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'rollback'
+[2023-08-02T15:16:29.265838+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_rollback_control'
+[2023-08-02T15:16:29.265897+00:00 INFO] [run:510] Experiment ended with status: completed
+[2023-08-02T15:16:29.265950+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'experiment'
+[2023-08-02T15:16:29.265999+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_experiment_control'
+[2023-08-02T15:16:29.266044+00:00 DEBUG] [__init__:103] Cleaning up controls
+[2023-08-02T15:16:29.266090+00:00 DEBUG] [__init__:112] Cleaning up control 'reliably'
+[2023-08-02T15:16:29.266136+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'cleanup_control'
+[2023-08-02T15:16:29.266181+00:00 INFO] [experiment:248] Finishing Reliably execution...
+[2023-08-02T15:16:29.428658+00:00 DEBUG] [experiment:163] Stopping Reliably state checker now
+[2023-08-02T15:16:29.429144+00:00 DEBUG] [experiment:494] Completing execution '298347d5-5153-4acb-868b-a68203322bb1' status: completed
+[2023-08-02T15:16:29.801452+00:00 DEBUG] [experiment:587] Sending plan '5cf1c3d8-c5b0-4ffb-b242-9b14703bb57b' status: completed
+[2023-08-02T15:16:30.097207+00:00 DEBUG] [experiment:612] Sending execution state: {'current': 'finished', 'status': 'completed', 'deviated': False, 'plan_id': '5cf1c3d8-c5b0-4ffb-b242-9b14703bb57b'}
+[2023-08-02T15:16:30.536823+00:00 INFO] [experiment:311] Finished Reliably execution. Bye!
+[2023-08-02T15:16:30.537333+00:00 DEBUG] [caching:42] Clearing activities cache
