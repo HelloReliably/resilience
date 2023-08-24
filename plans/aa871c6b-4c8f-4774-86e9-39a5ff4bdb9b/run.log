@@ -1,0 +1,262 @@
+[2023-08-24T14:36:14.438979+00:00 INFO] [plan:263] ################################################################################
+[2023-08-24T14:36:14.439146+00:00 INFO] [plan:264] Starting Reliably experiment: https://app.reliably.com/api/v1/organization/8b5fddfd-1da8-4586-934b-f184f0ef7904/experiments/7ffd143e-bad6-4b11-b194-0f28a5fa60ef/raw
+[2023-08-24T14:36:14.439248+00:00 DEBUG] [__init__:206] Loading global control 'reliably-integration-slack'
+[2023-08-24T14:36:14.520222+00:00 DEBUG] [__init__:206] Loading global control 'reliably-integration-opentelemetry'
+[2023-08-24T14:36:15.774219+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-08-24T14:36:15.774419+00:00 DEBUG] [caching:35] Cached 3 activities
+[2023-08-24T14:36:15.774674+00:00 INFO] [experiment:58] Validating the experiment's syntax
+[2023-08-24T14:36:15.775052+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-08-24T14:36:15.775404+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-08-24T14:36:15.775660+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-08-24T14:36:18.493191+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'validate_control'
+[2023-08-24T14:36:18.493342+00:00 INFO] [experiment:109] Experiment looks valid
+[2023-08-24T14:36:18.493396+00:00 DEBUG] [caching:42] Clearing activities cache
+[2023-08-24T14:36:18.493471+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-08-24T14:36:18.493524+00:00 DEBUG] [caching:35] Cached 3 activities
+[2023-08-24T14:36:18.493669+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-08-24T14:36:18.493781+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-08-24T14:36:18.493828+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-08-24T14:36:18.493907+00:00 DEBUG] [configuration:160] Loading dynamic configuration...
+[2023-08-24T14:36:18.494037+00:00 INFO] [run:369] Running experiment: Add/set delay for a percentage of requests going through a url map on a given path
+[2023-08-24T14:36:18.496547+00:00 DEBUG] [run:800] 1 activities will be run in the background
+[2023-08-24T14:36:18.496687+00:00 DEBUG] [__init__:171] Initializing global control 'reliably-integration-slack'
+[2023-08-24T14:36:18.496750+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'configure_control'
+[2023-08-24T14:36:18.496794+00:00 DEBUG] [__init__:171] Initializing global control 'reliably-integration-opentelemetry'
+[2023-08-24T14:36:18.496866+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py'
+[2023-08-24T14:36:18.510108+00:00 INFO] [oltp:432] Chaos Toolkit Open Telemetry tracer created
+[2023-08-24T14:36:18.511329+00:00 DEBUG] [oltp:144] Starting capturing OLTP traces
+[2023-08-24T14:36:18.523471+00:00 DEBUG] [__init__:64] Initializing controls
+[2023-08-24T14:36:18.523573+00:00 DEBUG] [__init__:73] Initializing control 'reliably'
+[2023-08-24T14:36:18.523648+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-08-24T14:36:18.523773+00:00 DEBUG] [experiment:412] Configure Reliably's experiment control
+[2023-08-24T14:36:18.526255+00:00 DEBUG] [experiment:589] Sending plan 'aa871c6b-4c8f-4774-86e9-39a5ff4bdb9b' status: running
+[2023-08-24T14:36:19.371370+00:00 INFO] [experiment:195] Reliably execution: 9d0bfeb3-2e9d-428f-9d15-58d49311401a
+[2023-08-24T14:36:19.692187+00:00 DEBUG] [experiment:614] Sending execution state: {'current': 'running', 'started_on': '2023-08-24T14:36:18.523821+00:00', 'plan_id': 'aa871c6b-4c8f-4774-86e9-39a5ff4bdb9b'}
+[2023-08-24T14:36:20.045470+00:00 DEBUG] [experiment:72] Starting Reliably state checker now
+[2023-08-24T14:36:20.045630+00:00 INFO] [run:396] Steady-state strategy: default
+[2023-08-24T14:36:20.046738+00:00 INFO] [run:400] Rollbacks strategy: always
+[2023-08-24T14:36:20.047015+00:00 INFO] [run:408] No steady state hypothesis defined. That's ok, just exploring.
+[2023-08-24T14:36:20.047307+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'experiment'
+[2023-08-24T14:36:20.047606+00:00 DEBUG] [python:196] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:20.375824+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'experiment'
+[2023-08-24T14:36:20.376018+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_experiment_control'
+[2023-08-24T14:36:20.376710+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'experiment'
+[2023-08-24T14:36:20.377039+00:00 DEBUG] [python:196] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-08-24T14:36:20.377535+00:00 INFO] [run:684] Playing your experiment's method now...
+[2023-08-24T14:36:20.378138+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'method'
+[2023-08-24T14:36:20.378461+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_method_control'
+[2023-08-24T14:36:20.378785+00:00 DEBUG] [activity:137] activity will run in the background
+[2023-08-24T14:36:20.379412+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:20.379559+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:20.379918+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.380352+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.380941+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:20.381370+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:20.381840+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.382230+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.382704+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:20.383135+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:20.383278+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:20.384082+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:20.622755+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:20.622955+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.623041+00:00 INFO] [activity:209] Action: inject-gradual-traffic-into-endpoint [in background]
+[2023-08-24T14:36:20.626739+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:20.627182+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:20.627515+00:00 INFO] [activity:215] Action: pause for a while
+[2023-08-24T14:36:21.140138+00:00 DEBUG] [python:33] Activity 'pause for a while' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/pauses.py'
+[2023-08-24T14:36:21.140394+00:00 INFO] [pauses:23] Pausing activity for 10s or until the execution is resumed
+[2023-08-24T14:36:21.206723+00:00 DEBUG] [python:33] Activity 'inject-gradual-traffic-into-endpoint' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py'
+[2023-08-24T14:36:21.207904+00:00 DEBUG] [activity:294] Activity failed
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py", line 62, in inject_gradual_traffic_into_endpoint
+    raise ActivityFailed("missing load test dependency")
+chaoslib.exceptions.ActivityFailed: missing load test dependency
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/activity.py", line 287, in run_activity
+    result = run_python_activity(activity, configuration, secrets)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 58, in run_python_activity
+    raise ActivityFailed(
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py", line 62, in inject_gradual_traffic_into_endpoint
+    raise ActivityFailed("missing load test dependency")
+chaoslib.exceptions.ActivityFailed: chaoslib.exceptions.ActivityFailed: missing load test dependency
+[2023-08-24T14:36:21.210933+00:00 ERROR] [activity:245]   => failed: chaoslib.exceptions.ActivityFailed: missing load test dependency
+[2023-08-24T14:36:21.552851+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:21.553056+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:21.553115+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:21.553890+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:21.554085+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:21.554624+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:22.563461+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:22.563648+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:31.140732+00:00 INFO] [pauses:26] Resuming execution...
+[2023-08-24T14:36:31.140970+00:00 DEBUG] [activity:239]   => succeeded without any result value
+[2023-08-24T14:36:31.489826+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:31.490032+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:31.490093+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:31.490149+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:31.490201+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:31.490265+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:32.319746+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:32.319936+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:32.320071+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:32.320146+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:32.320200+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:32.320254+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:32.320307+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:32.320366+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:32.548469+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:32.548655+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:32.548740+00:00 INFO] [activity:215] Action: inject-traffic-delay
+[2023-08-24T14:36:32.966408+00:00 DEBUG] [python:33] Activity 'inject-traffic-delay' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosgcp/lb/actions.py'
+[2023-08-24T14:36:32.966808+00:00 DEBUG] [__init__:209] Using GCP credentials from file: /tmp/tmpkhmuevob/tmp/config
+[2023-08-24T14:36:34.722425+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:35.971344+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:37.125433+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:38.424768+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:39.579955+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:40.722051+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:42.032477+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:43.190665+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:44.347450+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:45.506050+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e'
+[2023-08-24T14:36:45.687910+00:00 DEBUG] [__init__:130] Extended operation 'operation-1692887793315-603ac2790ad34-45cecab9-c585e11e' is done
+[2023-08-24T14:36:45.692839+00:00 DEBUG] [activity:237]   => succeeded with '{'id': '1609382282537399756', 'kind': 'compute#urlMap', 'name': 'demo-urlmap', 'creation_timestamp': '2023-08-18T03:42:44.381-07:00', 'fingerprint': 'GbazXFzalYY=', 'path_matchers': [{'name': 'allpaths', 'path_rules': [{'paths': ['/', '/*'], 'service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'route_action': {'fault_injection_policy': {'delay': {'percentage': 90.0, 'fixed_delay': {'nanos': 0, 'seconds': '2'}}}, 'weighted_backend_services': []}}], 'default_service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'route_rules': []}], 'host_rules': [{'hosts': ['sandbox.reliably.dev'], 'path_matcher': 'allpaths'}], 'default_service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'self_link': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/urlMaps/demo-urlmap', 'tests': []}'
+[2023-08-24T14:36:46.067796+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:46.068617+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:46.069285+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:36:46.069389+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:46.069481+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:46.069546+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:46.848810+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:46.849038+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-08-24T14:36:46.849175+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:46.849352+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:46.849414+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:36:46.849467+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:46.849515+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:36:46.849583+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:36:47.105139+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:36:47.105331+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-08-24T14:36:47.105410+00:00 INFO] [activity:215] Action: pause for a while
+[2023-08-24T14:36:47.437574+00:00 DEBUG] [python:33] Activity 'pause for a while' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/pauses.py'
+[2023-08-24T14:36:47.437891+00:00 INFO] [pauses:23] Pausing activity for 150s or until the execution is resumed
+[2023-08-24T14:39:17.438167+00:00 INFO] [pauses:26] Resuming execution...
+[2023-08-24T14:39:17.438403+00:00 DEBUG] [activity:239]   => succeeded without any result value
+[2023-08-24T14:39:17.821429+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:39:17.821605+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:17.821656+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:39:17.821704+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:17.821748+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:39:17.821802+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:39:19.017463+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:39:19.017665+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:19.018302+00:00 DEBUG] [run:937] Waiting for background activities to complete
+[2023-08-24T14:39:19.018636+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'method'
+[2023-08-24T14:39:19.018732+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_method_control'
+[2023-08-24T14:39:19.018985+00:00 WARNING] [run:727] Rollbacks were explicitly requested to be played
+[2023-08-24T14:39:19.019244+00:00 INFO] [run:964] Let's rollback...
+[2023-08-24T14:39:19.019340+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'rollback'
+[2023-08-24T14:39:19.019408+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_rollback_control'
+[2023-08-24T14:39:19.019464+00:00 INFO] [rollback:34] Rollback: remove-fault-injection-traffic-policy
+[2023-08-24T14:39:19.019657+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:39:19.019808+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:39:19.019885+00:00 DEBUG] [__init__:460] Applying before-control 'reliably' on 'activity'
+[2023-08-24T14:39:19.019975+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-08-24T14:39:19.020024+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:39:19.020082+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:39:19.211781+00:00 DEBUG] [__init__:460] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:39:19.211968+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-08-24T14:39:19.212454+00:00 INFO] [activity:215] Action: remove-fault-injection-traffic-policy
+[2023-08-24T14:39:19.530456+00:00 DEBUG] [python:33] Activity 'remove-fault-injection-traffic-policy' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosgcp/lb/actions.py'
+[2023-08-24T14:39:19.530806+00:00 DEBUG] [__init__:209] Using GCP credentials from file: /tmp/tmpkhmuevob/tmp/config
+[2023-08-24T14:39:21.307553+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:22.562800+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:23.829660+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:24.992233+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:26.149421+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:27.276962+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:28.541754+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:29.770591+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:31.023934+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:32.157527+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:33.402501+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:34.687964+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:35.818433+00:00 DEBUG] [__init__:125] Waiting for extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9'
+[2023-08-24T14:39:35.980949+00:00 DEBUG] [__init__:130] Extended operation 'operation-1692887959830-603ac317d7e24-4b8636b7-b02e74f9' is done
+[2023-08-24T14:39:35.984810+00:00 DEBUG] [activity:237]   => succeeded with '{'id': '1609382282537399756', 'kind': 'compute#urlMap', 'name': 'demo-urlmap', 'creation_timestamp': '2023-08-18T03:42:44.381-07:00', 'fingerprint': '2aDubxWWeUM=', 'path_matchers': [{'name': 'allpaths', 'path_rules': [{'paths': ['/', '/*'], 'service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'route_action': {'weighted_backend_services': []}}], 'default_service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'route_rules': []}], 'host_rules': [{'hosts': ['sandbox.reliably.dev'], 'path_matcher': 'allpaths'}], 'default_service': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default', 'self_link': 'https://www.googleapis.com/compute/v1/projects/staging10022023/global/urlMaps/demo-urlmap', 'tests': []}'
+[2023-08-24T14:39:36.312596+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:39:36.312793+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:36.312920+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'activity'
+[2023-08-24T14:39:36.312982+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:36.313031+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-08-24T14:39:36.313094+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:39:37.016539+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-08-24T14:39:37.016716+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-08-24T14:39:37.016967+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'rollback'
+[2023-08-24T14:39:37.017051+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_rollback_control'
+[2023-08-24T14:39:37.017423+00:00 INFO] [run:515] Experiment ended with status: completed
+[2023-08-24T14:39:37.017491+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-slack' on 'experiment'
+[2023-08-24T14:39:37.017731+00:00 DEBUG] [python:196] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-08-24T14:39:37.628571+00:00 DEBUG] [__init__:460] Applying after-control 'reliably-integration-opentelemetry' on 'experiment'
+[2023-08-24T14:39:37.628767+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_experiment_control'
+[2023-08-24T14:39:37.628982+00:00 DEBUG] [__init__:460] Applying after-control 'reliably' on 'experiment'
+[2023-08-24T14:39:37.629060+00:00 DEBUG] [python:196] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-08-24T14:39:37.880770+00:00 DEBUG] [slack:129] Capture Slack messages from #acme
+[2023-08-24T14:39:37.881088+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel #acme [C057K7HCV7A]
+[2023-08-24T14:39:38.534223+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-syntheticmonitoringcheckfailureathighsensitivity
+[2023-08-24T14:39:38.534393+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-syntheticmonitoringcheckfailureathighsensitivity [C05NTAUG31V]
+[2023-08-24T14:39:38.689464+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:38.689641+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-24-latency-is-high
+[2023-08-24T14:39:38.689704+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-24-latency-is-high [C05NWS8DU3H]
+[2023-08-24T14:39:38.858161+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:38.858352+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-noticeable-slow-down-1
+[2023-08-24T14:39:38.858435+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-noticeable-slow-down-1 [C05P0UZDQF8]
+[2023-08-24T14:39:38.996503+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:38.996713+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-golly
+[2023-08-24T14:39:38.996783+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-golly [C05P1LKK8T0]
+[2023-08-24T14:39:39.155506+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-slowdown
+[2023-08-24T14:39:39.155684+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-slowdown [C05P7FYUB8B]
+[2023-08-24T14:39:39.295758+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:39.295962+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-test
+[2023-08-24T14:39:39.296028+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-test [C05P87CEGR0]
+[2023-08-24T14:39:39.438915+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:39.439109+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-noticeable-slow-down
+[2023-08-24T14:39:39.439165+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-noticeable-slow-down [C05PX9K9RPS]
+[2023-08-24T14:39:39.581375+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:39.581562+00:00 DEBUG] [slack:129] Capture Slack messages from incident-2023-08-23-doom
+[2023-08-24T14:39:39.581624+00:00 DEBUG] [slack:131] Fetching the last 300 messages for the past 4mn [2023-08-24 14:35:37.880718+00:00] from channel incident-2023-08-23-doom [C05PXUVRH5W]
+[2023-08-24T14:39:39.719347+00:00 ERROR] [slack:158] Failed to retrieve Slack channel history: The request to the Slack API failed. (url: https://www.slack.com/api/conversations.history)
+The server responded with: {'ok': False, 'error': 'not_in_channel'}
+[2023-08-24T14:39:39.719551+00:00 DEBUG] [__init__:103] Cleaning up controls
+[2023-08-24T14:39:39.720093+00:00 DEBUG] [__init__:112] Cleaning up control 'reliably'
+[2023-08-24T14:39:39.720385+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'cleanup_control'
+[2023-08-24T14:39:39.720740+00:00 DEBUG] [__init__:265] Cleaning up global control 'reliably-integration-slack'
+[2023-08-24T14:39:39.721049+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'cleanup_control'
+[2023-08-24T14:39:39.721348+00:00 DEBUG] [__init__:265] Cleaning up global control 'reliably-integration-opentelemetry'
+[2023-08-24T14:39:39.721427+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'cleanup_control'
+[2023-08-24T14:39:39.721893+00:00 DEBUG] [oltp:155] Stopping capturing OLTP traces
+[2023-08-24T14:39:39.722260+00:00 DEBUG] [oltp:165] Finished capturing OLTP traces
+[2023-08-24T14:39:39.722517+00:00 INFO] [experiment:241] Finishing Reliably execution...
+[2023-08-24T14:39:39.800985+00:00 DEBUG] [experiment:154] Stopping Reliably state checker now
+[2023-08-24T14:39:39.801498+00:00 DEBUG] [experiment:496] Completing execution '9d0bfeb3-2e9d-428f-9d15-58d49311401a' status: completed
+[2023-08-24T14:39:40.267203+00:00 DEBUG] [experiment:589] Sending plan 'aa871c6b-4c8f-4774-86e9-39a5ff4bdb9b' status: completed
+[2023-08-24T14:39:40.561186+00:00 DEBUG] [experiment:614] Sending execution state: {'current': 'finished', 'status': 'completed', 'deviated': False, 'plan_id': 'aa871c6b-4c8f-4774-86e9-39a5ff4bdb9b'}
+[2023-08-24T14:39:40.988134+00:00 INFO] [experiment:300] Finished Reliably execution. Bye!
+[2023-08-24T14:39:40.988404+00:00 DEBUG] [caching:42] Clearing activities cache
