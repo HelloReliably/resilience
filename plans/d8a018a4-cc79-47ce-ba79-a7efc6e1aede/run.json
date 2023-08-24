@@ -1,0 +1,187 @@
+{
+  "chaoslib-version": "1.38.0",
+  "platform": "Linux-5.15.0-1041-azure-x86_64-with-glibc2.35",
+  "node": "fv-az189-55",
+  "experiment": {
+    "tags": [
+      "reliability",
+      "tls"
+    ],
+    "title": "Performs a range of checks on the certificate of a remote endpoint",
+    "method": [],
+    "version": "1.0.0",
+    "controls": [
+      {
+        "name": "reliably",
+        "provider": {
+          "type": "python",
+          "module": "chaosreliably.controls.experiment",
+          "arguments": {
+            "exp_id": "7279d19b-dd37-43dc-baaa-5ccdcf4c0cb9",
+            "org_id": "8b5fddfd-1da8-4586-934b-f184f0ef7904"
+          }
+        }
+      }
+    ],
+    "extensions": [
+      {
+        "name": "chatgpt",
+        "messages": [
+          {
+            "role": "user",
+            "content": "What are the reliability risks of an expired TLS certificate?"
+          }
+        ]
+      },
+      {
+        "name": "reliably",
+        "pauses": [],
+        "termination": null,
+        "execution_url": "https://app.reliably.com/executions/view/?id=32ffc0a1-a34e-41c3-a54e-c3265de7ab86&exp=7279d19b-dd37-43dc-baaa-5ccdcf4c0cb9",
+        "extra": [
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "commit",
+            "value": "https://github.com/HelloReliably/resilience/tree/main/plans/d8a018a4-cc79-47ce-ba79-a7efc6e1aede"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "repo",
+            "value": "https://github.com/HelloReliably/resilience"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "run",
+            "value": "https://github.com/HelloReliably/resilience/actions/runs/5964566365"
+          }
+        ],
+        "chaostoolkit_extensions": [
+          {
+            "name": "chaostoolkit-reliably",
+            "version": "0.61.8"
+          }
+        ]
+      }
+    ],
+    "description": "This experiment should peform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+    "configuration": {
+      "host": {
+        "key": "RELIABLY_PARAM_HOST",
+        "type": "env",
+        "default": "reliably.com",
+        "env_var_type": "str"
+      },
+      "port": {
+        "key": "RELIABLY_PARAM_PORT",
+        "type": "env",
+        "default": 443,
+        "env_var_type": "int"
+      },
+      "alt_names": {
+        "key": "RELIABLY_PARAM_ALT_NAMES",
+        "type": "env",
+        "default": null,
+        "env_var_type": "json"
+      },
+      "expire_after": {
+        "key": "RELIABLY_PARAM_EXPIRE_AFTER",
+        "type": "env",
+        "default": "7d",
+        "env_var_type": "str"
+      }
+    },
+    "contributions": {},
+    "steady-state-hypothesis": {
+      "title": "Verify the conditions of your system",
+      "probes": [
+        {
+          "name": "verify-certificate",
+          "type": "probe",
+          "provider": {
+            "func": "verify_certificate",
+            "type": "python",
+            "module": "chaosreliably.activities.tls.probes",
+            "arguments": {
+              "host": "${host}",
+              "port": "${port}",
+              "alt_names": "${alt_names}",
+              "expire_after": "${expire_after}"
+            }
+          },
+          "tolerance": true
+        }
+      ]
+    }
+  },
+  "start": "2023-08-24T13:45:58.441121",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "name": "verify-certificate",
+            "type": "probe",
+            "provider": {
+              "func": "verify_certificate",
+              "type": "python",
+              "module": "chaosreliably.activities.tls.probes",
+              "arguments": {
+                "host": "${host}",
+                "port": "${port}",
+                "alt_names": "${alt_names}",
+                "expire_after": "${expire_after}"
+              }
+            },
+            "tolerance": true
+          },
+          "output": true,
+          "start": "2023-08-24T13:45:59.717928",
+          "status": "succeeded",
+          "end": "2023-08-24T13:46:00.319330",
+          "duration": 0.601402,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "after": {
+      "steady_state_met": true,
+      "probes": [
+        {
+          "activity": {
+            "name": "verify-certificate",
+            "type": "probe",
+            "provider": {
+              "func": "verify_certificate",
+              "type": "python",
+              "module": "chaosreliably.activities.tls.probes",
+              "arguments": {
+                "host": "${host}",
+                "port": "${port}",
+                "alt_names": "${alt_names}",
+                "expire_after": "${expire_after}"
+              }
+            },
+            "tolerance": true
+          },
+          "output": true,
+          "start": "2023-08-24T13:46:00.610861",
+          "status": "succeeded",
+          "end": "2023-08-24T13:46:00.969207",
+          "duration": 0.358346,
+          "tolerance_met": true
+        }
+      ]
+    },
+    "during": []
+  },
+  "run": [],
+  "rollbacks": [],
+  "end": "2023-08-24T13:46:01.363505",
+  "duration": 2.9279773235321045
+}
