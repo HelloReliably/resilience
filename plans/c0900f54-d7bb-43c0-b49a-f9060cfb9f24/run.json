@@ -1,0 +1,564 @@
+{
+  "chaoslib-version": "1.38.0",
+  "platform": "Linux-5.15.0-1041-azure-x86_64-with-glibc2.35",
+  "node": "fv-az392-747",
+  "experiment": {
+    "tags": [
+      "Load Balancer",
+      "Google Cloud"
+    ],
+    "title": "Add/set delay for a percentage of requests going through a url map on a given path",
+    "method": [
+      {
+        "name": "inject-gradual-traffic-into-endpoint",
+        "type": "action",
+        "provider": {
+          "func": "inject_gradual_traffic_into_endpoint",
+          "type": "python",
+          "module": "chaosreliably.activities.load.actions",
+          "arguments": {
+            "endpoint": "https://sandbox.reliably.dev/users",
+            "test_duration": "${traffic_load_test_duration}",
+            "enable_opentracing": true,
+            "step_additional_vu": 2,
+            "vu_per_second_rate": 2,
+            "results_json_filepath": "loadresult.json"
+          }
+        },
+        "background": true
+      },
+      {
+        "name": "pause for a while",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": 10
+          }
+        }
+      },
+      {
+        "name": "inject-traffic-delay",
+        "type": "action",
+        "provider": {
+          "func": "inject_traffic_delay",
+          "type": "python",
+          "module": "chaosgcp.lb.actions",
+          "arguments": {
+            "url_map": "${url_map}",
+            "target_name": "${target_name}",
+            "target_path": "${target_path}",
+            "delay_in_nanos": "${delay_in_nanos}",
+            "delay_in_seconds": "${delay_in_seconds}",
+            "impacted_percentage": "${impacted_percentage}"
+          }
+        }
+      },
+      {
+        "name": "pause for a while",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": "${pause_duration_after_fault_injection}"
+          }
+        }
+      }
+    ],
+    "version": "1.0.0",
+    "controls": [
+      {
+        "name": "reliably",
+        "provider": {
+          "type": "python",
+          "module": "chaosreliably.controls.experiment",
+          "arguments": {
+            "exp_id": "7ffd143e-bad6-4b11-b194-0f28a5fa60ef",
+            "org_id": "8b5fddfd-1da8-4586-934b-f184f0ef7904"
+          }
+        }
+      }
+    ],
+    "rollbacks": [
+      {
+        "name": "remove-fault-injection-traffic-policy",
+        "type": "action",
+        "provider": {
+          "func": "remove_fault_injection_traffic_policy",
+          "type": "python",
+          "module": "chaosgcp.lb.actions",
+          "arguments": {
+            "url_map": "${url_map}",
+            "target_name": "${target_name}",
+            "target_path": "${target_path}"
+          }
+        }
+      }
+    ],
+    "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+    "configuration": {
+      "url_map": {
+        "key": "RELIABLY_PARAM_URL_MAP",
+        "type": "env",
+        "default": "demo-urlmap",
+        "env_var_type": "str"
+      },
+      "target_name": {
+        "key": "RELIABLY_PARAM_TARGET_NAME",
+        "type": "env",
+        "default": "allpaths",
+        "env_var_type": "str"
+      },
+      "target_path": {
+        "key": "RELIABLY_PARAM_TARGET_PATH",
+        "type": "env",
+        "default": "/*",
+        "env_var_type": "str"
+      },
+      "delay_in_nanos": {
+        "key": "RELIABLY_PARAM_DELAY_IN_NANOS",
+        "type": "env",
+        "default": 0,
+        "env_var_type": "int"
+      },
+      "delay_in_seconds": {
+        "key": "RELIABLY_PARAM_DELAY_IN_SECONDS",
+        "type": "env",
+        "default": 2,
+        "env_var_type": "int"
+      },
+      "impacted_percentage": {
+        "key": "RELIABLY_PARAM_IMPACTED_PERCENTAGE",
+        "type": "env",
+        "default": 90,
+        "env_var_type": "float"
+      },
+      "traffic_load_test_duration": {
+        "key": "RELIABLY_PARAM_TRAFFIC_LOAD_TEST_DURATION",
+        "type": "env",
+        "default": 150,
+        "env_var_type": "int"
+      },
+      "pause_duration_after_fault_injection": {
+        "key": "RELIABLY_PARAM_PAUSE_DURATION_AFTER_FAULT_INJECTION",
+        "type": "env",
+        "default": 150,
+        "env_var_type": "int"
+      },
+      "reliably_capture_slack_channel_pattern": {
+        "key": "RELIABLY_PARAM_CAPTURED_SLACK_CHANNELS_PATTERN",
+        "type": "env",
+        "default": "incident-*",
+        "env_var_type": "str"
+      }
+    },
+    "contributions": {
+      "errors": "none",
+      "latency": "none",
+      "security": "none",
+      "availability": "none"
+    },
+    "extensions": [
+      {
+        "name": "reliably",
+        "pauses": [],
+        "termination": null,
+        "execution_url": "https://app.reliably.com/executions/view/?id=e09d447d-c57c-4435-95cf-8b9ea9aa944c&exp=7ffd143e-bad6-4b11-b194-0f28a5fa60ef",
+        "extra": [
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "commit",
+            "value": "https://github.com/HelloReliably/resilience/tree/main/plans/c0900f54-d7bb-43c0-b49a-f9060cfb9f24"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "repo",
+            "value": "https://github.com/HelloReliably/resilience"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "run",
+            "value": "https://github.com/HelloReliably/resilience/actions/runs/6095109450"
+          }
+        ],
+        "chaostoolkit_extensions": [
+          {
+            "name": "chaostoolkit-google-cloud-platform",
+            "version": "0.11.0"
+          },
+          {
+            "name": "chaostoolkit-reliably",
+            "version": "0.66.0"
+          }
+        ],
+        "captures": {
+          "slack": {
+            "channels": [
+              {
+                "id": "C057K7HCV7A",
+                "name": "#acme",
+                "conversation": [
+                  {
+                    "bot_id": "B039NNX8GRH",
+                    "type": "message",
+                    "text": "Experiment is finished",
+                    "user": "U03A1BN3RDX",
+                    "ts": "1693991748.154549",
+                    "app_id": "A039KSG18TX",
+                    "blocks": [
+                      {
+                        "type": "rich_text",
+                        "block_id": "siqq",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "type": "text",
+                                "text": "Experiment is finished"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "team": "T1FBR1CTW",
+                    "bot_profile": {
+                      "id": "B039NNX8GRH",
+                      "deleted": false,
+                      "name": "Reliably",
+                      "updated": 1676033731,
+                      "app_id": "A039KSG18TX",
+                      "icons": {
+                        "image_36": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_36.png",
+                        "image_48": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_48.png",
+                        "image_72": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_72.png"
+                      },
+                      "team_id": "T1FBR1CTW"
+                    },
+                    "edited": {
+                      "user": "B039NNX8GRH",
+                      "ts": "1693991942.000000"
+                    },
+                    "attachments": [
+                      {
+                        "id": 1,
+                        "blocks": [
+                          {
+                            "type": "section",
+                            "block_id": "LxbcK",
+                            "text": {
+                              "type": "mrkdwn",
+                              "text": "*Add/set delay for a percentage of requests going through a url map on a given path*",
+                              "verbatim": false
+                            }
+                          },
+                          {
+                            "type": "context",
+                            "block_id": "OFh",
+                            "elements": [
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Host:* fv-az392-747\n*State:* Completed successfully",
+                                "verbatim": false
+                              }
+                            ]
+                          }
+                        ],
+                        "color": "#06FF00",
+                        "fallback": "Experiment is finished"
+                      }
+                    ],
+                    "thread_ts": "1693991748.154549",
+                    "reply_count": 10,
+                    "reply_users_count": 1,
+                    "latest_reply": "1693991943.276619",
+                    "reply_users": [
+                      "U03A1BN3RDX"
+                    ],
+                    "is_locked": false,
+                    "subscribed": false
+                  }
+                ],
+                "threads": {}
+              },
+              {
+                "id": "C05NTAUG31V",
+                "name": "incident-2023-08-23-syntheticmonitoringcheckfailureathighsensitivity",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05NWS8DU3H",
+                "name": "incident-2023-08-24-latency-is-high",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05P0UZDQF8",
+                "name": "incident-2023-08-23-noticeable-slow-down-1",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05P1LKK8T0",
+                "name": "incident-2023-08-23-golly",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05P7FYUB8B",
+                "name": "incident-2023-08-23-slowdown",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05P87CEGR0",
+                "name": "incident-2023-08-23-test",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05PX9K9RPS",
+                "name": "incident-2023-08-23-noticeable-slow-down",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05PXUVRH5W",
+                "name": "incident-2023-08-23-doom",
+                "conversation": [],
+                "threads": {}
+              },
+              {
+                "id": "C05Q2ADLEPJ",
+                "name": "incident-2023-08-24-demo2",
+                "conversation": [],
+                "threads": {}
+              }
+            ],
+            "users": {}
+          }
+        }
+      }
+    ]
+  },
+  "start": "2023-09-06T09:15:46.190995",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": null,
+    "after": null,
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "name": "pause for a while",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": 10
+          }
+        }
+      },
+      "output": null,
+      "start": "2023-09-06T09:15:48.453865",
+      "status": "succeeded",
+      "end": "2023-09-06T09:15:58.985429",
+      "duration": 10.531564
+    },
+    {
+      "activity": {
+        "name": "inject-gradual-traffic-into-endpoint",
+        "type": "action",
+        "provider": {
+          "func": "inject_gradual_traffic_into_endpoint",
+          "type": "python",
+          "module": "chaosreliably.activities.load.actions",
+          "arguments": {
+            "endpoint": "https://sandbox.reliably.dev/users",
+            "test_duration": "${traffic_load_test_duration}",
+            "enable_opentracing": true,
+            "step_additional_vu": 2,
+            "vu_per_second_rate": 2,
+            "results_json_filepath": "loadresult.json"
+          }
+        },
+        "background": true
+      },
+      "output": null,
+      "start": "2023-09-06T09:15:48.455555",
+      "status": "failed",
+      "exception": [
+        "Traceback (most recent call last):\n",
+        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py\", line 56, in run_python_activity\n    return func(**arguments)\n           ^^^^^^^^^^^^^^^^^\n",
+        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py\", line 62, in inject_gradual_traffic_into_endpoint\n    raise ActivityFailed(\"missing load test dependency\")\n",
+        "chaoslib.exceptions.ActivityFailed: missing load test dependency\n",
+        "\nDuring handling of the above exception, another exception occurred:\n\n",
+        "chaoslib.exceptions.ActivityFailed: chaoslib.exceptions.ActivityFailed: missing load test dependency\n"
+      ],
+      "end": "2023-09-06T09:15:48.992495",
+      "duration": 0.53694
+    },
+    {
+      "activity": {
+        "name": "inject-traffic-delay",
+        "type": "action",
+        "provider": {
+          "func": "inject_traffic_delay",
+          "type": "python",
+          "module": "chaosgcp.lb.actions",
+          "arguments": {
+            "url_map": "${url_map}",
+            "target_name": "${target_name}",
+            "target_path": "${target_path}",
+            "delay_in_nanos": "${delay_in_nanos}",
+            "delay_in_seconds": "${delay_in_seconds}",
+            "impacted_percentage": "${impacted_percentage}"
+          }
+        }
+      },
+      "output": {
+        "id": "1609382282537399756",
+        "kind": "compute#urlMap",
+        "name": "demo-urlmap",
+        "creation_timestamp": "2023-08-18T03:42:44.381-07:00",
+        "fingerprint": "GbazXFzalYY=",
+        "path_matchers": [
+          {
+            "name": "allpaths",
+            "path_rules": [
+              {
+                "paths": [
+                  "/",
+                  "/*"
+                ],
+                "service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+                "route_action": {
+                  "fault_injection_policy": {
+                    "delay": {
+                      "percentage": 90.0,
+                      "fixed_delay": {
+                        "nanos": 0,
+                        "seconds": "2"
+                      }
+                    }
+                  },
+                  "weighted_backend_services": []
+                }
+              }
+            ],
+            "default_service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+            "route_rules": []
+          }
+        ],
+        "host_rules": [
+          {
+            "hosts": [
+              "sandbox.reliably.dev"
+            ],
+            "path_matcher": "allpaths"
+          }
+        ],
+        "default_service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+        "self_link": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/urlMaps/demo-urlmap",
+        "tests": []
+      },
+      "start": "2023-09-06T09:16:00.309884",
+      "status": "succeeded",
+      "end": "2023-09-06T09:16:14.097764",
+      "duration": 13.78788
+    },
+    {
+      "activity": {
+        "name": "pause for a while",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": "${pause_duration_after_fault_injection}"
+          }
+        }
+      },
+      "output": null,
+      "start": "2023-09-06T09:16:15.445759",
+      "status": "succeeded",
+      "end": "2023-09-06T09:18:45.886693",
+      "duration": 150.440934
+    }
+  ],
+  "rollbacks": [
+    {
+      "activity": {
+        "name": "remove-fault-injection-traffic-policy",
+        "type": "action",
+        "provider": {
+          "func": "remove_fault_injection_traffic_policy",
+          "type": "python",
+          "module": "chaosgcp.lb.actions",
+          "arguments": {
+            "url_map": "${url_map}",
+            "target_name": "${target_name}",
+            "target_path": "${target_path}"
+          }
+        }
+      },
+      "output": {
+        "id": "1609382282537399756",
+        "kind": "compute#urlMap",
+        "name": "demo-urlmap",
+        "creation_timestamp": "2023-08-18T03:42:44.381-07:00",
+        "fingerprint": "2aDubxWWeUM=",
+        "path_matchers": [
+          {
+            "name": "allpaths",
+            "path_rules": [
+              {
+                "paths": [
+                  "/",
+                  "/*"
+                ],
+                "service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+                "route_action": {
+                  "weighted_backend_services": []
+                }
+              }
+            ],
+            "default_service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+            "route_rules": []
+          }
+        ],
+        "host_rules": [
+          {
+            "hosts": [
+              "sandbox.reliably.dev"
+            ],
+            "path_matcher": "allpaths"
+          }
+        ],
+        "default_service": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/backendServices/demo-lb-backend-default",
+        "self_link": "https://www.googleapis.com/compute/v1/projects/staging10022023/global/urlMaps/demo-urlmap",
+        "tests": []
+      },
+      "start": "2023-09-06T09:18:47.485023",
+      "status": "succeeded",
+      "end": "2023-09-06T09:19:01.560658",
+      "duration": 14.075635
+    }
+  ],
+  "end": "2023-09-06T09:19:02.738104",
+  "duration": 196.54933762550354
+}
