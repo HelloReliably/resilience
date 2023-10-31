@@ -1,0 +1,19 @@
+jobs:
+  run-experiment:
+    environment: reliably
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+    - name: Execute Reliably Plan
+      uses: reliablyhq/actions/plan@main
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        org-id: 8b5fddfd-1da8-4586-934b-f184f0ef7904
+        plan-id: e16d8159-30ee-47a3-b8af-2ff5d21e36c6
+        reliably-experiment-extra: '[{"type":"url","provider":"github","topic":"commit","value":"https://github.com/HelloReliably/resilience/tree/main/plans/e16d8159-30ee-47a3-b8af-2ff5d21e36c6"}]'
+        reliably-host: app.reliably.com
+        reliably-service-token: ${{ secrets.RELIABLY_SERVICE_TOKEN }}
+        working-dir: plans/e16d8159-30ee-47a3-b8af-2ff5d21e36c6
+name: Reliably Plan e16d8159-30ee-47a3-b8af-2ff5d21e36c6
+on:
+  workflow_dispatch: null
