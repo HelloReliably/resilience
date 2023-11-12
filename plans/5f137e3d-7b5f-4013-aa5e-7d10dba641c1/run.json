@@ -1,0 +1,884 @@
+{
+  "chaoslib-version": "1.40.0",
+  "platform": "Linux-6.2.0-1015-azure-x86_64-with-glibc2.35",
+  "node": "fv-az570-844",
+  "experiment": {
+    "tags": [
+      "product-catalog"
+    ],
+    "title": "Terminate product catalog process",
+    "method": [
+      {
+        "name": "exec-in-pods",
+        "type": "action",
+        "provider": {
+          "func": "exec_in_pods",
+          "type": "python",
+          "module": "chaosk8s.pod.actions",
+          "arguments": {
+            "ns": "${ns_M001}",
+            "all": "${all_M001}",
+            "cmd": "${cmd_M001}",
+            "qty": "${qty_M001}",
+            "mode": "${mode_M001}",
+            "rand": "${rand_M001}",
+            "order": "${order_M001}",
+            "container_name": "${container_name_M001}",
+            "label_selector": "${label_selector_M001}",
+            "request_timeout": "${request_timeout_M001}"
+          }
+        }
+      },
+      {
+        "name": "pause-execution",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": "${duration_M004}"
+          }
+        }
+      },
+      {
+        "name": "get-events",
+        "type": "probe",
+        "provider": {
+          "func": "get_events",
+          "type": "python",
+          "module": "chaosk8s.event.probes",
+          "arguments": {
+            "limit": "${limit_M003}",
+            "label_selector": "${label_selector_M003}"
+          }
+        }
+      }
+    ],
+    "runtime": {
+      "rollbacks": {
+        "strategy": "default"
+      },
+      "hypothesis": {
+        "strategy": "before-method-only",
+        "fail_fast": false,
+        "frequency": 1
+      }
+    },
+    "version": "1.0.0",
+    "controls": [
+      {
+        "name": "reliably",
+        "provider": {
+          "type": "python",
+          "module": "chaosreliably.controls.experiment",
+          "arguments": {
+            "exp_id": "5145d5bf-f2a2-4478-9e0b-fac01f1f7561",
+            "org_id": "8b5fddfd-1da8-4586-934b-f184f0ef7904"
+          }
+        }
+      }
+    ],
+    "rollbacks": [],
+    "extensions": [
+      {
+        "name": "reliablyui",
+        "workflow": {
+          "method": [
+            {
+              "suffix": "M001",
+              "template": {
+                "id": "k8s-pod-exec_in_pods",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "ns",
+                          "help": "",
+                          "type": "string",
+                          "title": "Namespace",
+                          "default": "default",
+                          "required": true,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "label_selector",
+                          "help": "Selectors to target the appropriate pods",
+                          "type": "string",
+                          "title": "Label Selector",
+                          "default": null,
+                          "required": true,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "cmd",
+                          "help": "Command to execute in the containers of the targeted pods",
+                          "type": "string",
+                          "title": "Command",
+                          "default": "",
+                          "required": true,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "qty",
+                          "help": "The number of pods to terminate",
+                          "type": "integer",
+                          "title": "Number of Pods to Terminate",
+                          "default": 1,
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "mode",
+                          "help": "Either fixed or percentage. With fixed, the quantity is used as the number of pods. With percentage terminates a volume of pods between 1 and 100.",
+                          "type": "string",
+                          "title": "Quantity Selection Mode",
+                          "default": "fixed",
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "all",
+                          "help": "Terminate all pods matching the selector",
+                          "type": "boolean",
+                          "title": "Select All Pods",
+                          "default": false,
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "rand",
+                          "help": "Terminate the number of pods defined by quantity at random within the selected pool of pods",
+                          "type": "boolean",
+                          "title": "Random Selection",
+                          "default": false,
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "order",
+                          "help": "How candidate pods are selected: alphabetic or oldest",
+                          "type": "string",
+                          "title": "Label Selector",
+                          "default": "alphabetic",
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "container_name",
+                          "help": "When a pod is made of several containers, specify the name of the container to exec from",
+                          "type": "string",
+                          "title": "Name of the Container",
+                          "default": null,
+                          "required": false,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "request_timeout",
+                          "help": "Timeout for the command to complete",
+                          "type": "integer",
+                          "title": "Timeout",
+                          "default": 60,
+                          "required": false,
+                          "placeholder": ""
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "Kubernetes",
+                        "Pod"
+                      ],
+                      "title": "Execute a command in the specified pod's container",
+                      "method": [
+                        {
+                          "name": "exec-in-pods",
+                          "type": "action",
+                          "provider": {
+                            "func": "exec_in_pods",
+                            "type": "python",
+                            "module": "chaosk8s.pod.actions",
+                            "arguments": {
+                              "ns": "${ns}",
+                              "all": "${all}",
+                              "cmd": "${cmd}",
+                              "qty": "${qty}",
+                              "mode": "${mode}",
+                              "rand": "${rand}",
+                              "order": "${order}",
+                              "container_name": "${container_name}",
+                              "label_selector": "${label_selector}",
+                              "request_timeout": "${request_timeout}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+                      "configuration": {
+                        "ns": {
+                          "key": "RELIABLY_PARAM_NS",
+                          "type": "env",
+                          "default": "default",
+                          "env_var_type": "str"
+                        },
+                        "all": {
+                          "key": "RELIABLY_PARAM_ALL",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "cmd": {
+                          "key": "RELIABLY_PARAM_CMD",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "qty": {
+                          "key": "RELIABLY_PARAM_QTY",
+                          "type": "env",
+                          "default": 1,
+                          "env_var_type": "int"
+                        },
+                        "mode": {
+                          "key": "RELIABLY_PARAM_MODE",
+                          "type": "env",
+                          "default": "fixed",
+                          "env_var_type": "str"
+                        },
+                        "rand": {
+                          "key": "RELIABLY_PARAM_RAND",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "order": {
+                          "key": "RELIABLY_PARAM_ORDER",
+                          "type": "env",
+                          "default": "alphabetic",
+                          "env_var_type": "str"
+                        },
+                        "container_name": {
+                          "key": "RELIABLY_PARAM_CONTAINER_NAME",
+                          "type": "env",
+                          "env_var_type": "str"
+                        },
+                        "label_selector": {
+                          "key": "RELIABLY_PARAM_LABEL_SELECTOR",
+                          "type": "env",
+                          "env_var_type": "str"
+                        },
+                        "request_timeout": {
+                          "key": "RELIABLY_PARAM_REQUEST_TIMEOUT",
+                          "type": "env",
+                          "default": 60,
+                          "env_var_type": "int"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "exec_in_pods",
+                    "labels": [
+                      "Kubernetes",
+                      "Pod"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "suffix": "M004",
+              "template": {
+                "id": "reliably-pauses-pause_execution",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "duration",
+                          "help": "",
+                          "type": "integer",
+                          "title": "Duration",
+                          "default": 0,
+                          "required": false,
+                          "placeholder": ""
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "pauses",
+                        "reliability"
+                      ],
+                      "title": "Pause the execution of the experiment until the resume state has been received.",
+                      "method": [
+                        {
+                          "name": "pause-execution",
+                          "type": "action",
+                          "provider": {
+                            "func": "pause_execution",
+                            "type": "python",
+                            "module": "chaosreliably.activities.pauses",
+                            "arguments": {
+                              "duration": "${duration}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+                      "configuration": {
+                        "duration": {
+                          "key": "RELIABLY_PARAM_DURATION",
+                          "type": "env",
+                          "default": 0,
+                          "env_var_type": "int"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "pause_execution",
+                    "labels": [
+                      "pauses",
+                      "reliability"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true
+              ]
+            },
+            {
+              "suffix": "M003",
+              "template": {
+                "id": "k8s-event-get_events",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "label_selector",
+                          "help": "Reduce the returned list of events to the matching selector",
+                          "type": "string",
+                          "title": "Label Selector",
+                          "default": "",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "limit",
+                          "help": "Limit to that number of events",
+                          "type": "integer",
+                          "title": "Limit",
+                          "default": 100,
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "Event",
+                        "Kubernetes"
+                      ],
+                      "title": "Retrieve Kubernetes events across all namespaces",
+                      "method": [
+                        {
+                          "name": "get-events",
+                          "type": "probe",
+                          "provider": {
+                            "func": "get_events",
+                            "type": "python",
+                            "module": "chaosk8s.event.probes",
+                            "arguments": {
+                              "limit": "${limit}",
+                              "label_selector": "${label_selector}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment should perform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+                      "configuration": {
+                        "limit": {
+                          "key": "RELIABLY_PARAM_LIMIT",
+                          "type": "env",
+                          "default": 100,
+                          "env_var_type": "int"
+                        },
+                        "label_selector": {
+                          "key": "RELIABLY_PARAM_LABEL_SELECTOR",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "get_events",
+                    "labels": [
+                      "Event",
+                      "Kubernetes"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true
+              ]
+            }
+          ],
+          "warmup": [],
+          "rollbacks": [],
+          "hypothesis": [
+            {
+              "suffix": "H002",
+              "template": {
+                "id": "honeycomb-slo-slo_has_enough_remaining_budget",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "dataset_slug",
+                          "help": "Dataset slug",
+                          "type": "string",
+                          "title": "Dataset",
+                          "default": "",
+                          "required": true,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "slo_id",
+                          "help": "",
+                          "type": "string",
+                          "title": "SLO Identifier",
+                          "default": "",
+                          "required": true,
+                          "placeholder": ""
+                        },
+                        {
+                          "key": "min_budget",
+                          "help": "A number representing how much budget left should exist still",
+                          "type": "float",
+                          "title": "Remaining Budget",
+                          "default": 1,
+                          "required": false,
+                          "placeholder": ""
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "SLO",
+                        "Honeycomb"
+                      ],
+                      "title": "Verifies that an SLO has enough error budget left",
+                      "method": [
+                        {
+                          "name": "slo-has-enough-remaining-budget",
+                          "type": "probe",
+                          "provider": {
+                            "func": "slo_has_enough_remaining_budget",
+                            "type": "python",
+                            "module": "chaoshoneycomb.slo.probes",
+                            "arguments": {
+                              "slo_id": "${slo_id}",
+                              "min_budget": "${min_budget}",
+                              "dataset_slug": "${dataset_slug}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment should perform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+                      "configuration": {
+                        "slo_id": {
+                          "key": "RELIABLY_PARAM_SLO_ID",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "min_budget": {
+                          "key": "RELIABLY_PARAM_MIN_BUDGET",
+                          "type": "env",
+                          "default": 1,
+                          "env_var_type": "float"
+                        },
+                        "dataset_slug": {
+                          "key": "RELIABLY_PARAM_DATASET_SLUG",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "slo_has_enough_remaining_budget",
+                    "labels": [
+                      "SLO",
+                      "Honeycomb"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "tolerance": true,
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "toleranceType": "boolean"
+            }
+          ]
+        }
+      },
+      {
+        "name": "reliably",
+        "pauses": [],
+        "termination": null,
+        "execution_url": "https://app.reliably.com/executions/view/?id=6c422d2d-0d48-4921-9c2a-716129414a76&exp=5145d5bf-f2a2-4478-9e0b-fac01f1f7561",
+        "extra": [
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "commit",
+            "value": "https://github.com/HelloReliably/resilience/tree/main/plans/5f137e3d-7b5f-4013-aa5e-7d10dba641c1"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "repo",
+            "value": "https://github.com/HelloReliably/resilience"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "run",
+            "value": "https://github.com/HelloReliably/resilience/actions/runs/6843208291"
+          }
+        ],
+        "chaostoolkit_extensions": [
+          {
+            "name": "chaostoolkit-kubernetes",
+            "version": "0.33.0"
+          },
+          {
+            "name": "chaostoolkit-reliably",
+            "version": "0.73.0"
+          },
+          {
+            "name": "chaostoolkit-honeycomb",
+            "version": "0.6.2"
+          }
+        ],
+        "captures": {
+          "slack": {
+            "channels": [
+              {
+                "id": "C063N9LJG78",
+                "name": "#webinar-reliably-and-hny",
+                "conversation": [
+                  {
+                    "bot_id": "B064H8K7NAY",
+                    "type": "message",
+                    "text": "Experiment is finished",
+                    "user": "U064090L90X",
+                    "ts": "1699824487.637539",
+                    "app_id": "A064BSQGCBX",
+                    "blocks": [
+                      {
+                        "type": "rich_text",
+                        "block_id": "GpZ7",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "type": "text",
+                                "text": "Experiment is finished"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    "team": "T1JVCMVH7",
+                    "bot_profile": {
+                      "id": "B064H8K7NAY",
+                      "deleted": false,
+                      "name": "Reliably",
+                      "updated": 1699280464,
+                      "app_id": "A064BSQGCBX",
+                      "icons": {
+                        "image_36": "https://avatars.slack-edge.com/2023-11-06/6147918347413_2bae05b6570f0cb23b41_36.png",
+                        "image_48": "https://avatars.slack-edge.com/2023-11-06/6147918347413_2bae05b6570f0cb23b41_48.png",
+                        "image_72": "https://avatars.slack-edge.com/2023-11-06/6147918347413_2bae05b6570f0cb23b41_72.png"
+                      },
+                      "team_id": "T1JVCMVH7"
+                    },
+                    "edited": {
+                      "user": "B064H8K7NAY",
+                      "ts": "1699824490.000000"
+                    },
+                    "attachments": [
+                      {
+                        "id": 1,
+                        "blocks": [
+                          {
+                            "type": "section",
+                            "block_id": "fMglP",
+                            "text": {
+                              "type": "mrkdwn",
+                              "text": "*Terminate product catalog process*",
+                              "verbatim": false
+                            }
+                          },
+                          {
+                            "type": "context",
+                            "block_id": "5pcLT",
+                            "elements": [
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Host:* fv-az570-844\n*State:* Completed successfully",
+                                "verbatim": false
+                              }
+                            ]
+                          }
+                        ],
+                        "color": "#06FF00",
+                        "fallback": "Experiment is finished"
+                      }
+                    ],
+                    "thread_ts": "1699824487.637539",
+                    "reply_count": 5,
+                    "reply_users_count": 1,
+                    "latest_reply": "1699824491.239339",
+                    "reply_users": [
+                      "U064090L90X"
+                    ],
+                    "is_locked": false,
+                    "subscribed": false
+                  }
+                ],
+                "threads": {}
+              }
+            ],
+            "users": {}
+          }
+        }
+      }
+    ],
+    "description": "Terminate the product catalog process from within its container and review the impact of this event.",
+    "configuration": {
+      "ns_M001": {
+        "key": "RELIABLY_PARAM_NS_M001",
+        "type": "env",
+        "default": "default",
+        "env_var_type": "str"
+      },
+      "all_M001": {
+        "key": "RELIABLY_PARAM_ALL_M001",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "cmd_M001": {
+        "key": "RELIABLY_PARAM_CMD_M001",
+        "type": "env",
+        "default": "kill -TERM 1",
+        "env_var_type": "str"
+      },
+      "qty_M001": {
+        "key": "RELIABLY_PARAM_QTY_M001",
+        "type": "env",
+        "default": 1,
+        "env_var_type": "int"
+      },
+      "mode_M001": {
+        "key": "RELIABLY_PARAM_MODE_M001",
+        "type": "env",
+        "default": "fixed",
+        "env_var_type": "str"
+      },
+      "rand_M001": {
+        "key": "RELIABLY_PARAM_RAND_M001",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "limit_M003": {
+        "key": "RELIABLY_PARAM_LIMIT_M003",
+        "type": "env",
+        "default": 10,
+        "env_var_type": "int"
+      },
+      "order_M001": {
+        "key": "RELIABLY_PARAM_ORDER_M001",
+        "type": "env",
+        "default": "alphabetic",
+        "env_var_type": "str"
+      },
+      "slo_id_H002": {
+        "key": "RELIABLY_PARAM_SLO_ID_H002",
+        "type": "env",
+        "default": "jj1DkLEEinJ",
+        "env_var_type": "str"
+      },
+      "duration_M004": {
+        "key": "RELIABLY_PARAM_DURATION_M004",
+        "type": "env",
+        "default": 30,
+        "env_var_type": "int"
+      },
+      "min_budget_H002": {
+        "key": "RELIABLY_PARAM_MIN_BUDGET_H002",
+        "type": "env",
+        "default": 50,
+        "env_var_type": "float"
+      },
+      "dataset_slug_H002": {
+        "key": "RELIABLY_PARAM_DATASET_SLUG_H002",
+        "type": "env",
+        "default": "frontend-proxy",
+        "env_var_type": "str"
+      },
+      "container_name_M001": {
+        "key": "RELIABLY_PARAM_CONTAINER_NAME_M001",
+        "type": "env",
+        "default": "productcatalogservice",
+        "env_var_type": "str"
+      },
+      "label_selector_M001": {
+        "key": "RELIABLY_PARAM_LABEL_SELECTOR_M001",
+        "type": "env",
+        "default": "app.kubernetes.io/name=otel-demo-productcatalogservice",
+        "env_var_type": "str"
+      },
+      "label_selector_M003": {
+        "key": "RELIABLY_PARAM_LABEL_SELECTOR_M003",
+        "type": "env",
+        "default": "app.kubernetes.io/name=otel-demo-productcatalogservice",
+        "env_var_type": "str"
+      },
+      "request_timeout_M001": {
+        "key": "RELIABLY_PARAM_REQUEST_TIMEOUT_M001",
+        "type": "env",
+        "default": 60,
+        "env_var_type": "int"
+      },
+      "slack_extra": [
+        "<https://app.reliably.com/executions/view/?id=6c422d2d-0d48-4921-9c2a-716129414a76&exp=5145d5bf-f2a2-4478-9e0b-fac01f1f7561|View Reliably Execution>"
+      ]
+    },
+    "contributions": {
+      "errors": "low",
+      "latency": "none",
+      "security": "none",
+      "availability": "medium"
+    },
+    "steady-state-hypothesis": {
+      "title": "Steady-State Hypothesis",
+      "probes": [
+        {
+          "name": "slo-has-enough-remaining-budget",
+          "type": "probe",
+          "provider": {
+            "func": "slo_has_enough_remaining_budget",
+            "type": "python",
+            "module": "chaoshoneycomb.slo.probes",
+            "arguments": {
+              "slo_id": "${slo_id_H002}",
+              "min_budget": "${min_budget_H002}",
+              "dataset_slug": "${dataset_slug_H002}"
+            }
+          },
+          "tolerance": true
+        }
+      ]
+    }
+  },
+  "start": "2023-11-12T21:28:05.168096",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": {
+      "steady_state_met": false,
+      "probes": [
+        {
+          "activity": {
+            "name": "slo-has-enough-remaining-budget",
+            "type": "probe",
+            "provider": {
+              "func": "slo_has_enough_remaining_budget",
+              "type": "python",
+              "module": "chaoshoneycomb.slo.probes",
+              "arguments": {
+                "slo_id": "${slo_id_H002}",
+                "min_budget": "${min_budget_H002}",
+                "dataset_slug": "${dataset_slug_H002}"
+              }
+            },
+            "tolerance": true
+          },
+          "output": false,
+          "start": "2023-11-12T21:28:08.145340",
+          "status": "succeeded",
+          "end": "2023-11-12T21:28:08.875511",
+          "duration": 0.730171,
+          "tolerance_met": false
+        }
+      ]
+    },
+    "after": null,
+    "during": []
+  },
+  "run": [],
+  "rollbacks": [],
+  "end": "2023-11-12T21:28:10.793342",
+  "duration": 5.6272289752960205
+}

@@ -1,0 +1,149 @@
+[2023-11-12T21:28:01.849854+00:00 INFO] [plan:278] ################################################################################
+[2023-11-12T21:28:01.849998+00:00 INFO] [plan:282] Starting Reliably experiment: https://app.reliably.com/api/v1/organization/8b5fddfd-1da8-4586-934b-f184f0ef7904/experiments/5145d5bf-f2a2-4478-9e0b-fac01f1f7561/raw
+[2023-11-12T21:28:01.850089+00:00 DEBUG] [__init__:201] Loading global control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372'
+[2023-11-12T21:28:01.936393+00:00 DEBUG] [__init__:201] Loading global control 'reliably-integration-slack'
+[2023-11-12T21:28:02.067721+00:00 DEBUG] [__init__:201] Loading global control 'reliably-integration-opentelemetry'
+[2023-11-12T21:28:03.395943+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-11-12T21:28:03.396097+00:00 DEBUG] [caching:35] Cached 4 activities
+[2023-11-12T21:28:03.396216+00:00 INFO] [experiment:58] Validating the experiment's syntax
+[2023-11-12T21:28:03.396283+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-11-12T21:28:03.396416+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-11-12T21:28:03.396466+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-11-12T21:28:05.165132+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'validate_control'
+[2023-11-12T21:28:05.165257+00:00 INFO] [experiment:109] Experiment looks valid
+[2023-11-12T21:28:05.165309+00:00 DEBUG] [caching:42] Clearing activities cache
+[2023-11-12T21:28:05.165382+00:00 DEBUG] [caching:24] Building activity cache...
+[2023-11-12T21:28:05.165436+00:00 DEBUG] [caching:35] Cached 4 activities
+[2023-11-12T21:28:05.165542+00:00 DEBUG] [configuration:63] Loading configuration...
+[2023-11-12T21:28:05.165666+00:00 DEBUG] [secret:78] Loading secrets...
+[2023-11-12T21:28:05.165829+00:00 DEBUG] [secret:103] Done loading secrets
+[2023-11-12T21:28:05.165878+00:00 DEBUG] [configuration:160] Loading dynamic configuration...
+[2023-11-12T21:28:05.166072+00:00 INFO] [run:369] Running experiment: Terminate product catalog process
+[2023-11-12T21:28:05.168157+00:00 DEBUG] [__init__:166] Initializing global control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372'
+[2023-11-12T21:28:05.168256+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py'
+[2023-11-12T21:28:05.168377+00:00 DEBUG] [__init__:166] Initializing global control 'reliably-integration-slack'
+[2023-11-12T21:28:05.168434+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'configure_control'
+[2023-11-12T21:28:05.168476+00:00 DEBUG] [__init__:166] Initializing global control 'reliably-integration-opentelemetry'
+[2023-11-12T21:28:05.168524+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py'
+[2023-11-12T21:28:05.180232+00:00 INFO] [oltp:445] Chaos Toolkit Open Telemetry tracer created
+[2023-11-12T21:28:05.182000+00:00 DEBUG] [oltp:152] Starting capturing OpenTelemetry traces
+[2023-11-12T21:28:05.193510+00:00 DEBUG] [__init__:59] Initializing controls
+[2023-11-12T21:28:05.193603+00:00 DEBUG] [__init__:68] Initializing control 'reliably'
+[2023-11-12T21:28:05.193665+00:00 DEBUG] [python:196] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-11-12T21:28:05.193772+00:00 DEBUG] [experiment:475] Configure Reliably's experiment control
+[2023-11-12T21:28:05.194302+00:00 DEBUG] [chatgpt:43] Starting OpenAI GPT conversation in background
+[2023-11-12T21:28:05.196697+00:00 DEBUG] [experiment:654] Sending plan '5f137e3d-7b5f-4013-aa5e-7d10dba641c1' status: running
+[2023-11-12T21:28:06.243848+00:00 INFO] [experiment:213] Reliably execution: 6c422d2d-0d48-4921-9c2a-716129414a76
+[2023-11-12T21:28:06.535652+00:00 DEBUG] [experiment:679] Sending execution state: {'current': 'running', 'started_on': '2023-11-12T21:28:05.193820+00:00', 'plan_id': '5f137e3d-7b5f-4013-aa5e-7d10dba641c1'}
+[2023-11-12T21:28:06.900272+00:00 DEBUG] [experiment:85] Starting Reliably state checker now
+[2023-11-12T21:28:06.900379+00:00 DEBUG] [__init__:23] Apply 'started' on vendors
+[2023-11-12T21:28:06.901340+00:00 DEBUG] [__init__:25] Processing vendor OTELVendorHandler
+[2023-11-12T21:28:06.901648+00:00 DEBUG] [__init__:25] Processing vendor HoneycombVendorHandler
+[2023-11-12T21:28:07.137220+00:00 DEBUG] [honeycomb:105] Setting Honeycomb marker
+[2023-11-12T21:28:07.473657+00:00 DEBUG] [honeycomb:117] Honeycomb marker cKQ5yVBg5Nk set
+[2023-11-12T21:28:07.473963+00:00 INFO] [run:396] Steady-state strategy: before-method-only
+[2023-11-12T21:28:07.474030+00:00 INFO] [run:400] Rollbacks strategy: default
+[2023-11-12T21:28:07.474102+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'experiment'
+[2023-11-12T21:28:07.474167+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_experiment_control'
+[2023-11-12T21:28:07.474410+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-slack' on 'experiment'
+[2023-11-12T21:28:07.474469+00:00 DEBUG] [python:196] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:07.681969+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-opentelemetry' on 'experiment'
+[2023-11-12T21:28:07.682110+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_experiment_control'
+[2023-11-12T21:28:07.682162+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'experiment'
+[2023-11-12T21:28:07.682221+00:00 DEBUG] [python:196] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-11-12T21:28:07.682353+00:00 DEBUG] [run:563] Running steady-state hypothesis before the method
+[2023-11-12T21:28:07.682594+00:00 INFO] [hypothesis:186] Steady state hypothesis: Steady-State Hypothesis
+[2023-11-12T21:28:07.682697+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:07.682757+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_hypothesis_control'
+[2023-11-12T21:28:07.682802+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:07.682877+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_hypothesis_control'
+[2023-11-12T21:28:07.682924+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:07.682972+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_hypothesis_control'
+[2023-11-12T21:28:07.683015+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'hypothesis'
+[2023-11-12T21:28:07.683063+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_hypothesis_control'
+[2023-11-12T21:28:07.683104+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-slack' on 'hypothesis'
+[2023-11-12T21:28:07.683152+00:00 DEBUG] [python:196] Control 'before_hypothesis_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:07.917261+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-opentelemetry' on 'hypothesis'
+[2023-11-12T21:28:07.917741+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_hypothesis_control'
+[2023-11-12T21:28:07.917885+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'activity'
+[2023-11-12T21:28:07.917947+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-11-12T21:28:07.917992+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'activity'
+[2023-11-12T21:28:07.918036+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-11-12T21:28:07.918077+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'activity'
+[2023-11-12T21:28:07.918119+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2023-11-12T21:28:07.918249+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'activity'
+[2023-11-12T21:28:07.918297+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2023-11-12T21:28:07.918336+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-slack' on 'activity'
+[2023-11-12T21:28:07.918388+00:00 DEBUG] [python:196] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:08.145090+00:00 DEBUG] [__init__:455] Applying before-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-11-12T21:28:08.145232+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'before_activity_control'
+[2023-11-12T21:28:08.145300+00:00 INFO] [activity:215] Probe: slo-has-enough-remaining-budget
+[2023-11-12T21:28:08.619947+00:00 DEBUG] [python:33] Activity 'slo-has-enough-remaining-budget' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoshoneycomb/slo/probes.py'
+[2023-11-12T21:28:08.875391+00:00 DEBUG] [activity:237]   => succeeded with 'False'
+[2023-11-12T21:28:09.357205+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'activity'
+[2023-11-12T21:28:09.357635+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-11-12T21:28:09.357712+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'activity'
+[2023-11-12T21:28:09.357766+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-11-12T21:28:09.357809+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'activity'
+[2023-11-12T21:28:09.357856+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2023-11-12T21:28:09.357898+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'activity'
+[2023-11-12T21:28:09.357944+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2023-11-12T21:28:09.357996+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-slack' on 'activity'
+[2023-11-12T21:28:09.358048+00:00 DEBUG] [python:196] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:09.904776+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-opentelemetry' on 'activity'
+[2023-11-12T21:28:09.904924+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_activity_control'
+[2023-11-12T21:28:09.905754+00:00 DEBUG] [hypothesis:228] allowed tolerance is True
+[2023-11-12T21:28:09.906080+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:09.906376+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_hypothesis_control'
+[2023-11-12T21:28:09.906846+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:09.907134+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_hypothesis_control'
+[2023-11-12T21:28:09.907187+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'hypothesis'
+[2023-11-12T21:28:09.907234+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_hypothesis_control'
+[2023-11-12T21:28:09.907273+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'hypothesis'
+[2023-11-12T21:28:09.907317+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_hypothesis_control'
+[2023-11-12T21:28:09.907358+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-slack' on 'hypothesis'
+[2023-11-12T21:28:09.907410+00:00 DEBUG] [python:196] Control 'after_hypothesis_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:10.792322+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-opentelemetry' on 'hypothesis'
+[2023-11-12T21:28:10.792472+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_hypothesis_control'
+[2023-11-12T21:28:10.792616+00:00 CRITICAL] [run:579] Steady state probe 'slo-has-enough-remaining-budget' is not in the given tolerance so failing this experiment
+[2023-11-12T21:28:10.792968+00:00 INFO] [run:957] Let's rollback...
+[2023-11-12T21:28:10.793059+00:00 DEBUG] [__init__:455] Applying before-control 'reliably' on 'rollback'
+[2023-11-12T21:28:10.793118+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_rollback_control'
+[2023-11-12T21:28:10.793165+00:00 INFO] [rollback:31] No declared rollbacks, let's move on.
+[2023-11-12T21:28:10.793225+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'rollback'
+[2023-11-12T21:28:10.793274+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_rollback_control'
+[2023-11-12T21:28:10.793359+00:00 INFO] [run:515] Experiment ended with status: completed
+[2023-11-12T21:28:10.793414+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372' on 'experiment'
+[2023-11-12T21:28:10.793474+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_experiment_control'
+[2023-11-12T21:28:10.793516+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-slack' on 'experiment'
+[2023-11-12T21:28:10.793566+00:00 DEBUG] [python:196] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2023-11-12T21:28:11.318765+00:00 DEBUG] [__init__:455] Applying after-control 'reliably-integration-opentelemetry' on 'experiment'
+[2023-11-12T21:28:11.318952+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'after_experiment_control'
+[2023-11-12T21:28:11.319004+00:00 DEBUG] [__init__:455] Applying after-control 'reliably' on 'experiment'
+[2023-11-12T21:28:11.319060+00:00 DEBUG] [python:196] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2023-11-12T21:28:11.319288+00:00 DEBUG] [slack:45] Trying to capture the last 1mn of the Slack channel #webinar-reliably-and-hny
+[2023-11-12T21:28:12.451874+00:00 DEBUG] [slack:139] Capture Slack messages from #webinar-reliably-and-hny
+[2023-11-12T21:28:12.452014+00:00 DEBUG] [slack:141] Fetching the last 300 messages for the past 1mn [2023-11-12 21:27:12.451833+00:00] from channel #webinar-reliably-and-hny [C063N9LJG78]
+[2023-11-12T21:28:12.804971+00:00 DEBUG] [__init__:98] Cleaning up controls
+[2023-11-12T21:28:12.805105+00:00 DEBUG] [__init__:107] Cleaning up control 'reliably'
+[2023-11-12T21:28:12.805171+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'cleanup_control'
+[2023-11-12T21:28:12.805221+00:00 DEBUG] [__init__:260] Cleaning up global control 'reliably-integration-chatgpt-9358157085d8a62f172c8729a1821372'
+[2023-11-12T21:28:12.805273+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'cleanup_control'
+[2023-11-12T21:28:12.805314+00:00 DEBUG] [__init__:260] Cleaning up global control 'reliably-integration-slack'
+[2023-11-12T21:28:12.805359+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'cleanup_control'
+[2023-11-12T21:28:12.805400+00:00 DEBUG] [__init__:260] Cleaning up global control 'reliably-integration-opentelemetry'
+[2023-11-12T21:28:12.805444+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaostracing/oltp.py' does not declare 'cleanup_control'
+[2023-11-12T21:28:12.805497+00:00 DEBUG] [oltp:168] Stopping capturing OpenTelemetry traces
+[2023-11-12T21:28:12.805603+00:00 DEBUG] [oltp:178] Finished capturing OpenTelemetry traces
+[2023-11-12T21:28:12.805651+00:00 INFO] [experiment:271] Finishing Reliably execution...
+[2023-11-12T21:28:12.898474+00:00 DEBUG] [experiment:171] Stopping Reliably state checker now
+[2023-11-12T21:28:12.899314+00:00 DEBUG] [__init__:23] Apply 'finished' on vendors
+[2023-11-12T21:28:12.899794+00:00 DEBUG] [__init__:25] Processing vendor OTELVendorHandler
+[2023-11-12T21:28:12.900251+00:00 DEBUG] [__init__:25] Processing vendor HoneycombVendorHandler
+[2023-11-12T21:28:12.976948+00:00 DEBUG] [honeycomb:101] Updating Honeycomb marker cKQ5yVBg5Nk
+[2023-11-12T21:28:13.135150+00:00 DEBUG] [honeycomb:117] Honeycomb marker cKQ5yVBg5Nk set
+[2023-11-12T21:28:13.135425+00:00 INFO] [experiment:291] Finished Reliably execution. Bye!
+[2023-11-12T21:28:13.135516+00:00 DEBUG] [experiment:559] Completing execution '6c422d2d-0d48-4921-9c2a-716129414a76' status: completed
+[2023-11-12T21:28:13.791610+00:00 DEBUG] [experiment:654] Sending plan '5f137e3d-7b5f-4013-aa5e-7d10dba641c1' status: completed
+[2023-11-12T21:28:14.175895+00:00 DEBUG] [experiment:679] Sending execution state: {'current': 'finished', 'status': 'completed', 'deviated': False, 'plan_id': '5f137e3d-7b5f-4013-aa5e-7d10dba641c1'}
+[2023-11-12T21:28:14.651642+00:00 DEBUG] [caching:42] Clearing activities cache
