@@ -1,0 +1,1571 @@
+{
+  "chaoslib-version": "1.43.2",
+  "platform": "Linux-6.5.0-1022-azure-x86_64-with-glibc2.35",
+  "node": "fv-az1020-770",
+  "experiment": {
+    "tags": [
+      "Kubernetes",
+      "Pod"
+    ],
+    "title": "Delete pods labelled app=producer and review impacts",
+    "method": [
+      {
+        "name": "Run mild traffic into consumer service",
+        "type": "action",
+        "provider": {
+          "func": "run_load_test",
+          "type": "python",
+          "module": "chaosreliably.activities.load.actions",
+          "arguments": {
+            "qps": "${qps_W005}",
+            "url": "${url_W005}",
+            "body": "${body_W005}",
+            "host": "${host_W005}",
+            "method": "${method_W005}",
+            "headers": "${headers_W005}",
+            "duration": "${duration_W005}",
+            "insecure": "${insecure_W005}",
+            "test_name": "${test_name_W005}",
+            "content_type": "${content_type_W005}"
+          }
+        },
+        "background": true
+      },
+      {
+        "name": "Delete all pods labelled app=producer",
+        "type": "action",
+        "provider": {
+          "func": "terminate_pods",
+          "type": "python",
+          "module": "chaosk8s.pod.actions",
+          "arguments": {
+            "ns": "${ns_M001}",
+            "all": "${all_M001}",
+            "qty": "${qty_M001}",
+            "mode": "${mode_M001}",
+            "rand": "${rand_M001}",
+            "order": "${order_M001}",
+            "grace_period": "${grace_period_M001}",
+            "label_selector": "${label_selector_M001}"
+          }
+        },
+        "background": false
+      },
+      {
+        "name": "pause-execution",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": "${duration_M002}"
+          }
+        }
+      },
+      {
+        "name": "Get logs for producer pods",
+        "type": "probe",
+        "provider": {
+          "func": "read_pod_logs",
+          "type": "python",
+          "module": "chaosk8s.pod.probes",
+          "arguments": {
+            "ns": "${ns_M003}",
+            "last": "${last_M003}",
+            "from_previous": "${from_previous_M003}",
+            "container_name": "${container_name_M003}",
+            "label_selector": "${label_selector_M003}"
+          }
+        }
+      },
+      {
+        "name": "Get logs for consumer pods",
+        "type": "probe",
+        "provider": {
+          "func": "read_pod_logs",
+          "type": "python",
+          "module": "chaosk8s.pod.probes",
+          "arguments": {
+            "ns": "${ns_M004}",
+            "last": "${last_M004}",
+            "from_previous": "${from_previous_M004}",
+            "container_name": "${container_name_M004}",
+            "label_selector": "${label_selector_M004}"
+          }
+        }
+      }
+    ],
+    "runtime": {
+      "rollbacks": {
+        "strategy": "default"
+      },
+      "hypothesis": {
+        "strategy": "default",
+        "fail_fast": false,
+        "frequency": 1
+      }
+    },
+    "version": "1.0.0",
+    "controls": [
+      {
+        "name": "reliably",
+        "provider": {
+          "type": "python",
+          "module": "chaosreliably.controls.experiment",
+          "arguments": {
+            "exp_id": "381668ed-eac1-4f4a-8e03-d11b1e5f864c",
+            "org_id": "8b5fddfd-1da8-4586-934b-f184f0ef7904"
+          }
+        }
+      }
+    ],
+    "rollbacks": [],
+    "extensions": [
+      {
+        "name": "chatgpt",
+        "messages": [
+          {
+            "role": "user",
+            "content": "How to limit the blast radius of a restarting Kubernetes pod?"
+          }
+        ],
+        "results": [
+          {
+            "id": "chatcmpl-9gTKmURncPGq0FFl4z5Q9LZtQKUy0",
+            "object": "chat.completion",
+            "created": 1719909564,
+            "model": "gpt-4o-2024-05-13",
+            "choices": [
+              {
+                "index": 0,
+                "message": {
+                  "role": "assistant",
+                  "content": "Limiting the blast radius of a restarting Kubernetes pod is crucial to ensure that your chaos experiments do not unintentionally affect the entire system. Here are some strategies to achieve this:\n\n### 1. **Namespace Isolation**\n   - Use Kubernetes namespaces to isolate the resources. Conduct your experiments in a specific namespace dedicated to testing.\n   ```yaml\n   apiVersion: v1\n   kind: Namespace\n   metadata:\n     name: chaos-testing\n   ```\n\n### 2. **Label and Selector Usage**\n   - Apply labels to your pods and use selectors to target only specific pods.\n   ```yaml\n   apiVersion: v1\n   kind: Pod\n   metadata:\n     name: my-pod\n     labels:\n       app: my-app\n       environment: testing\n   ```\n\n### 3. **Pod Disruption Budgets (PDB)**\n   - Define Pod Disruption Budgets to limit the number of pods that can be disrupted at one time.\n   ```yaml\n   apiVersion: policy/v1beta1\n   kind: PodDisruptionBudget\n   metadata:\n     name: my-pdb\n     namespace: chaos-testing\n   spec:\n     minAvailable: 2\n     selector:\n       matchLabels:\n         app: my-app\n   ```\n\n### 4. **Resource Quotas**\n   - Set resource quotas for namespaces to limit the number of resources that can be created or modified.\n   ```yaml\n   apiVersion: v1\n   kind: ResourceQuota\n   metadata:\n     name: pod-quota\n     namespace: chaos-testing\n   spec:\n     hard:\n       pods: \"10\"\n       requests.cpu: \"4\"\n       requests.memory: 16Gi\n       limits.cpu: \"10\"\n       limits.memory: 32Gi\n   ```\n\n### 5. **Network Policies**\n   - Implement network policies to control the traffic flow between pods, ensuring that only specific pods can communicate with each other.\n   ```yaml\n   apiVersion: networking.k8s.io/v1\n   kind: NetworkPolicy\n   metadata:\n     name: allow-specific-traffic\n     namespace: chaos-testing\n   spec:\n     podSelector:\n       matchLabels:\n         app: my-app\n     policyTypes:\n     - Ingress\n     - Egress\n     ingress:\n     - from:\n       - podSelector:\n           matchLabels:\n             app: another-app\n     egress:\n     - to:\n       - podSelector:\n           matchLabels:\n             app: another-app\n   ```\n\n### 6. **Chaos Toolkit Configuration**\nIn your Chaos Toolkit experiment, you can specify actions and probes that target specific pods or namespaces.\n\n#### Example Experiment Configuration\n\n```json\n{\n    \"version\": \"1.0.0\",\n    \"title\": \"Restart a specific Kubernetes pod\",\n    \"description\": \"An experiment to restart a specific pod in a controlled manner\",\n    \"tags\": [\"kubernetes\", \"pod\", \"restart\"],\n    \"steady-state-hypothesis\": {\n        \"title\": \"Application should be healthy\",\n        \"probes\": [\n            {\n                \"type\": \"probe\",\n                \"name\": \"check_pod_status\",\n                \"tolerance\": true,\n                \"provider\": {\n                    \"type\": \"python\",\n                    \"module\": \"chaosk8s.pod.probes\",\n                    \"func\": \"read_pod_status\",\n                    \"arguments\": {\n                        \"name\": \"my-pod\",\n                        \"namespace\": \"chaos-testing\"\n                    }\n                }\n            }\n        ]\n    },\n    \"method\": [\n        {\n            \"type\": \"action\",\n            \"name\": \"restart_pod\",\n            \"provider\": {\n                \"type\": \"python\",\n                \"module\": \"chaosk8s.pod.actions\",\n                \"func\": \"terminate_pods\",\n                \"arguments\": {\n                    \"name_pattern\": \"^my-pod$\",\n                    \"namespace\": \"chaos-testing\"\n                }\n            }\n        }\n    ],\n    \"rollbacks\": []\n}\n```\n\nBy following these strategies, you can effectively limit the blast radius of your chaos experiments, ensuring that they are conducted in a controlled and safe manner."
+                },
+                "logprobs": null,
+                "finish_reason": "stop"
+              }
+            ],
+            "usage": {
+              "prompt_tokens": 92,
+              "completion_tokens": 857,
+              "total_tokens": 949
+            },
+            "system_fingerprint": "fp_d576307f90"
+          }
+        ]
+      },
+      {
+        "name": "reliablyui",
+        "workflow": {
+          "method": [
+            {
+              "suffix": "M001",
+              "template": {
+                "id": "k8s-pod-terminate_pods",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "ns",
+                          "help": "",
+                          "type": "string",
+                          "title": "Namespace",
+                          "default": "default",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "label_selector",
+                          "help": "Selectors to target the appropriate pods",
+                          "type": "string",
+                          "title": "Label Selector",
+                          "default": null,
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "qty",
+                          "help": "The number of pods to terminate",
+                          "type": "integer",
+                          "title": "Number of Pods to Terminate",
+                          "default": 1,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "mode",
+                          "help": "Either fixed or percentage. With fixed, the quantity is used as the number of pods. With percentage terminates a volume of pods between 1 and 100",
+                          "type": "string",
+                          "title": "Quantity Selection Mode",
+                          "default": "fixed",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "all",
+                          "help": "Terminate all pods matching the selector",
+                          "type": "boolean",
+                          "title": "Select All Pods",
+                          "default": false,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "rand",
+                          "help": "Terminate the number of pods defined by quantity at random within the selected pool of pods",
+                          "type": "boolean",
+                          "title": "Random Selection",
+                          "default": false,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "order",
+                          "help": "How candidate pods are selected: alphabetic or oldest",
+                          "type": "string",
+                          "title": "Label Selector",
+                          "default": "alphabetic",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "grace_period",
+                          "help": "Grace period for pods to complete their shutdown. Leave -1 for the default behavior",
+                          "type": "integer",
+                          "title": "Grace Period",
+                          "default": -1,
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "Kubernetes",
+                        "Pod"
+                      ],
+                      "title": "Terminate a pod gracefully, to simulate a failing condition",
+                      "method": [
+                        {
+                          "name": "terminate-pods",
+                          "type": "action",
+                          "provider": {
+                            "func": "terminate_pods",
+                            "type": "python",
+                            "module": "chaosk8s.pod.actions",
+                            "arguments": {
+                              "ns": "${ns}",
+                              "all": "${all}",
+                              "qty": "${qty}",
+                              "mode": "${mode}",
+                              "rand": "${rand}",
+                              "order": "${order}",
+                              "grace_period": "${grace_period}",
+                              "label_selector": "${label_selector}"
+                            }
+                          },
+                          "background": false
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [
+                        {
+                          "name": "chatgpt",
+                          "messages": [
+                            {
+                              "role": "user",
+                              "content": "How to limit the blast radius of a restarting Kubernetes pod?"
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+                      "configuration": {
+                        "ns": {
+                          "key": "RELIABLY_PARAM_NS",
+                          "type": "env",
+                          "default": "default",
+                          "env_var_type": "str"
+                        },
+                        "all": {
+                          "key": "RELIABLY_PARAM_ALL",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "qty": {
+                          "key": "RELIABLY_PARAM_QTY",
+                          "type": "env",
+                          "default": 1,
+                          "env_var_type": "int"
+                        },
+                        "mode": {
+                          "key": "RELIABLY_PARAM_MODE",
+                          "type": "env",
+                          "default": "fixed",
+                          "env_var_type": "str"
+                        },
+                        "rand": {
+                          "key": "RELIABLY_PARAM_RAND",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "order": {
+                          "key": "RELIABLY_PARAM_ORDER",
+                          "type": "env",
+                          "default": "alphabetic",
+                          "env_var_type": "str"
+                        },
+                        "grace_period": {
+                          "key": "RELIABLY_PARAM_GRACE_PERIOD",
+                          "type": "env",
+                          "default": -1,
+                          "env_var_type": "int"
+                        },
+                        "label_selector": {
+                          "key": "RELIABLY_PARAM_LABEL_SELECTOR",
+                          "type": "env",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "terminate_pods",
+                    "labels": [
+                      "Kubernetes",
+                      "Pod"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "suffix": "M002",
+              "template": {
+                "id": "reliably-pauses-pause_execution",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "duration",
+                          "help": "",
+                          "type": "integer",
+                          "title": "Duration",
+                          "default": 0,
+                          "required": false,
+                          "placeholder": ""
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "pauses",
+                        "reliability"
+                      ],
+                      "title": "Pause the execution of the experiment until the resume state has been received.",
+                      "method": [
+                        {
+                          "name": "pause-execution",
+                          "type": "action",
+                          "provider": {
+                            "func": "pause_execution",
+                            "type": "python",
+                            "module": "chaosreliably.activities.pauses",
+                            "arguments": {
+                              "duration": "${duration}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+                      "configuration": {
+                        "duration": {
+                          "key": "RELIABLY_PARAM_DURATION",
+                          "type": "env",
+                          "default": 0,
+                          "env_var_type": "int"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "pause_execution",
+                    "labels": [
+                      "pauses",
+                      "reliability"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true
+              ]
+            },
+            {
+              "suffix": "M003",
+              "template": {
+                "id": "k8s-pod-read_pod_logs",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "ns",
+                          "help": "",
+                          "type": "string",
+                          "title": "Namespace",
+                          "default": "default",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "label_selector",
+                          "help": "Selectors to target the appropriate pods",
+                          "type": "string",
+                          "title": "Label selector",
+                          "default": "",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "last",
+                          "help": "Either a number of seconds to read back or a string representing a period such 10 minutes",
+                          "type": "string",
+                          "title": "Period",
+                          "default": "30 seconds",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "from_previous",
+                          "help": "Read the logs from the previous incarnation of the pod",
+                          "type": "boolean",
+                          "title": "Read from Previous Pod",
+                          "default": false,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "container_name",
+                          "help": "When a pod is made of several containers, specify the name of the container to read from",
+                          "type": "string",
+                          "title": "Name of the Container",
+                          "default": null,
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "Kubernetes",
+                        "Pod"
+                      ],
+                      "title": "Fetch logs for all the pods matching a name or label selector",
+                      "method": [
+                        {
+                          "name": "read-pod-logs",
+                          "type": "probe",
+                          "provider": {
+                            "func": "read_pod_logs",
+                            "type": "python",
+                            "module": "chaosk8s.pod.probes",
+                            "arguments": {
+                              "ns": "${ns}",
+                              "last": "${last}",
+                              "from_previous": "${from_previous}",
+                              "container_name": "${container_name}",
+                              "label_selector": "${label_selector}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment should perform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+                      "configuration": {
+                        "ns": {
+                          "key": "RELIABLY_PARAM_NS",
+                          "type": "env",
+                          "default": "default",
+                          "env_var_type": "str"
+                        },
+                        "last": {
+                          "key": "RELIABLY_PARAM_LAST",
+                          "type": "env",
+                          "default": "30 seconds",
+                          "env_var_type": "str"
+                        },
+                        "from_previous": {
+                          "key": "RELIABLY_PARAM_FROM_PREVIOUS",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "container_name": {
+                          "key": "RELIABLY_PARAM_CONTAINER_NAME",
+                          "type": "env",
+                          "env_var_type": "str"
+                        },
+                        "label_selector": {
+                          "key": "RELIABLY_PARAM_LABEL_SELECTOR",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "read_pod_logs",
+                    "labels": [
+                      "Kubernetes",
+                      "Pod"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            },
+            {
+              "suffix": "M004",
+              "template": {
+                "id": "k8s-pod-read_pod_logs",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "ns",
+                          "help": "",
+                          "type": "string",
+                          "title": "Namespace",
+                          "default": "default",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "label_selector",
+                          "help": "Selectors to target the appropriate pods",
+                          "type": "string",
+                          "title": "Label selector",
+                          "default": "",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "last",
+                          "help": "Either a number of seconds to read back or a string representing a period such 10 minutes",
+                          "type": "string",
+                          "title": "Period",
+                          "default": "30 seconds",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "from_previous",
+                          "help": "Read the logs from the previous incarnation of the pod",
+                          "type": "boolean",
+                          "title": "Read from Previous Pod",
+                          "default": false,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "container_name",
+                          "help": "When a pod is made of several containers, specify the name of the container to read from",
+                          "type": "string",
+                          "title": "Name of the Container",
+                          "default": null,
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "Kubernetes",
+                        "Pod"
+                      ],
+                      "title": "Fetch logs for all the pods matching a name or label selector",
+                      "method": [
+                        {
+                          "name": "read-pod-logs",
+                          "type": "probe",
+                          "provider": {
+                            "func": "read_pod_logs",
+                            "type": "python",
+                            "module": "chaosk8s.pod.probes",
+                            "arguments": {
+                              "ns": "${ns}",
+                              "last": "${last}",
+                              "from_previous": "${from_previous}",
+                              "container_name": "${container_name}",
+                              "label_selector": "${label_selector}"
+                            }
+                          }
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment should perform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+                      "configuration": {
+                        "ns": {
+                          "key": "RELIABLY_PARAM_NS",
+                          "type": "env",
+                          "default": "default",
+                          "env_var_type": "str"
+                        },
+                        "last": {
+                          "key": "RELIABLY_PARAM_LAST",
+                          "type": "env",
+                          "default": "30 seconds",
+                          "env_var_type": "str"
+                        },
+                        "from_previous": {
+                          "key": "RELIABLY_PARAM_FROM_PREVIOUS",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "container_name": {
+                          "key": "RELIABLY_PARAM_CONTAINER_NAME",
+                          "type": "env",
+                          "env_var_type": "str"
+                        },
+                        "label_selector": {
+                          "key": "RELIABLY_PARAM_LABEL_SELECTOR",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "read_pod_logs",
+                    "labels": [
+                      "Kubernetes",
+                      "Pod"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "warmup": [
+            {
+              "suffix": "W005",
+              "template": {
+                "id": "reliably-load-run_load_test",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "url",
+                          "help": "",
+                          "type": "string",
+                          "title": "Target URL",
+                          "default": "",
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "duration",
+                          "help": "Duration of the entire load test",
+                          "type": "integer",
+                          "title": "Test Duration",
+                          "default": 30,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "test_name",
+                          "help": "Unique name for this particular test.",
+                          "type": "string",
+                          "title": "Test Name",
+                          "default": "load test",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "qps",
+                          "help": "Query per second rate",
+                          "type": "integer",
+                          "title": "QPS",
+                          "default": 5,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "insecure",
+                          "help": "Allow connection to an insecure HTTPS server",
+                          "type": "boolean",
+                          "title": "Insecure Connection",
+                          "default": false,
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "host",
+                          "help": "Force this Host header value",
+                          "type": "string",
+                          "title": "Host Header",
+                          "default": "",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "method",
+                          "help": "Use this HTTP method",
+                          "type": "string",
+                          "title": "Method",
+                          "default": "GET",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "headers",
+                          "help": "Comma-separated list of headers",
+                          "type": "string",
+                          "title": "Headers",
+                          "default": "",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "body",
+                          "help": "Content to pass to the request",
+                          "type": "string",
+                          "title": "Body",
+                          "default": "",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "content_type",
+                          "help": "Content-Type of the body request",
+                          "type": "string",
+                          "title": "Body Content-Type",
+                          "default": "",
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "related": [
+                      {
+                        "name": "reliably-pauses-pause_execution",
+                        "block": "method"
+                      },
+                      {
+                        "name": "reliably-load-verify_latency_percentile_from_load_test",
+                        "block": "hypothesis"
+                      }
+                    ],
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "reliability",
+                        "load"
+                      ],
+                      "title": "Run a load test against a URL",
+                      "method": [
+                        {
+                          "name": "run-load-test",
+                          "type": "action",
+                          "provider": {
+                            "func": "run_load_test",
+                            "type": "python",
+                            "module": "chaosreliably.activities.load.actions",
+                            "arguments": {
+                              "qps": "${qps}",
+                              "url": "${url}",
+                              "body": "${body}",
+                              "host": "${host}",
+                              "method": "${method}",
+                              "headers": "${headers}",
+                              "duration": "${duration}",
+                              "insecure": "${insecure}",
+                              "test_name": "${test_name}",
+                              "content_type": "${content_type}"
+                            }
+                          },
+                          "background": true
+                        }
+                      ],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+                      "configuration": {
+                        "qps": {
+                          "key": "RELIABLY_PARAM_QPS",
+                          "type": "env",
+                          "default": 5,
+                          "env_var_type": "int"
+                        },
+                        "url": {
+                          "key": "RELIABLY_PARAM_URL",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "body": {
+                          "key": "RELIABLY_PARAM_BODY",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "host": {
+                          "key": "RELIABLY_PARAM_HOST",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "method": {
+                          "key": "RELIABLY_PARAM_METHOD",
+                          "type": "env",
+                          "default": "GET",
+                          "env_var_type": "str"
+                        },
+                        "headers": {
+                          "key": "RELIABLY_PARAM_HEADERS",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        },
+                        "duration": {
+                          "key": "RELIABLY_PARAM_DURATION",
+                          "type": "env",
+                          "default": 30,
+                          "env_var_type": "int"
+                        },
+                        "insecure": {
+                          "key": "RELIABLY_PARAM_INSECURE",
+                          "type": "env",
+                          "default": false,
+                          "env_var_type": "bool"
+                        },
+                        "test_name": {
+                          "key": "RELIABLY_PARAM_TEST_NAME",
+                          "type": "env",
+                          "default": "load test",
+                          "env_var_type": "str"
+                        },
+                        "content_type": {
+                          "key": "RELIABLY_PARAM_CONTENT_TYPE",
+                          "type": "env",
+                          "default": "",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {}
+                    }
+                  },
+                  "metadata": {
+                    "name": "run_load_test",
+                    "labels": [
+                      "reliability",
+                      "load"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "background": true,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ]
+            }
+          ],
+          "rollbacks": [],
+          "hypothesis": [
+            {
+              "suffix": "H005",
+              "template": {
+                "id": "reliably-load-verify_latency_percentile_from_load_test",
+                "manifest": {
+                  "spec": {
+                    "type": "experiment",
+                    "schema": {
+                      "configuration": [
+                        {
+                          "key": "lower_than",
+                          "help": "Latency must be lower than this value for the percentile below",
+                          "type": "float",
+                          "title": "Lower Than",
+                          "default": 0.2,
+                          "required": true,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "percentile",
+                          "help": "Percentile to verify",
+                          "type": "string",
+                          "title": "Percentile",
+                          "default": "p99",
+                          "required": false,
+                          "placeholder": null
+                        },
+                        {
+                          "key": "test_name",
+                          "help": "Name of the test that generated the result to verify",
+                          "type": "string",
+                          "title": "Test Name",
+                          "default": "load test",
+                          "required": false,
+                          "placeholder": null
+                        }
+                      ]
+                    },
+                    "related": [
+                      {
+                        "name": "reliably-load-run_load_test",
+                        "block": "method"
+                      },
+                      {
+                        "name": "reliably-pauses-pause_execution",
+                        "block": "method"
+                      }
+                    ],
+                    "provider": "chaostoolkit",
+                    "template": {
+                      "tags": [
+                        "reliability",
+                        "load"
+                      ],
+                      "title": "Verify the latency of responses during a load test for a given percentile",
+                      "method": [],
+                      "version": "1.0.0",
+                      "extensions": [],
+                      "description": "This experiment should perform a non-destructive operation against your system. Still we recommend you try it against a non-production environment. This kind of experiment is useful when you want to measure how your system is performing.",
+                      "configuration": {
+                        "test_name": {
+                          "key": "RELIABLY_PARAM_TEST_NAME",
+                          "type": "env",
+                          "default": "load test",
+                          "env_var_type": "str"
+                        },
+                        "lower_than": {
+                          "key": "RELIABLY_PARAM_LOWER_THAN",
+                          "type": "env",
+                          "default": 0.2,
+                          "env_var_type": "float"
+                        },
+                        "percentile": {
+                          "key": "RELIABLY_PARAM_PERCENTILE",
+                          "type": "env",
+                          "default": "p99",
+                          "env_var_type": "str"
+                        }
+                      },
+                      "contributions": {},
+                      "steady-state-hypothesis": {
+                        "title": "Verify the conditions of your system",
+                        "probes": [
+                          {
+                            "name": "verify-latency-percentile-from-load-test",
+                            "type": "probe",
+                            "provider": {
+                              "func": "verify_latency_percentile_from_load_test",
+                              "type": "python",
+                              "module": "chaosreliably.activities.load.probes",
+                              "arguments": {
+                                "test_name": "${test_name}",
+                                "lower_than": "${lower_than}",
+                                "percentile": "${percentile}"
+                              }
+                            },
+                            "tolerance": true,
+                            "background": false
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "metadata": {
+                    "name": "verify_latency_percentile_from_load_test",
+                    "labels": [
+                      "reliability",
+                      "load"
+                    ],
+                    "annotations": null
+                  }
+                }
+              },
+              "tolerance": "",
+              "background": false,
+              "fieldsStatus": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "toleranceType": "string"
+            }
+          ]
+        }
+      },
+      {
+        "name": "reliably",
+        "pauses": [
+          {
+            "before_activity": "pause-execution",
+            "start": "2024-07-02T08:39:29.467033+00:00",
+            "duration": 30,
+            "end": "2024-07-02T08:39:59.921563+00:00"
+          }
+        ],
+        "termination": null,
+        "execution_url": "https://app.reliably.com/executions/view/?id=5407e19e-cb4b-4ef2-8f45-d7e6ffc3dd1c&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c",
+        "extra": [
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "commit",
+            "value": "https://github.com/HelloReliably/resilience/tree/main/plans/4f239652-dbf6-4dcf-a315-26b4c11a7e4d"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "repo",
+            "value": "https://github.com/HelloReliably/resilience"
+          },
+          {
+            "type": "url",
+            "provider": "github",
+            "topic": "run",
+            "value": "https://github.com/HelloReliably/resilience/actions/runs/9757711939"
+          }
+        ],
+        "chaostoolkit_extensions": [
+          {
+            "name": "chaostoolkit-kubernetes",
+            "version": "0.39.0"
+          },
+          {
+            "name": "chaostoolkit-reliably",
+            "version": "0.79.0"
+          }
+        ],
+        "captures": {
+          "slack": {
+            "channels": [
+              {
+                "id": "C057K7HCV7A",
+                "name": "#acme",
+                "conversation": [
+                  {
+                    "user": "U03A1BN3RDX",
+                    "type": "message",
+                    "ts": "1719909565.574899",
+                    "edited": {
+                      "user": "B039NNX8GRH",
+                      "ts": "1719909606.000000"
+                    },
+                    "bot_id": "B039NNX8GRH",
+                    "app_id": "A039KSG18TX",
+                    "text": "Experiment is finished",
+                    "team": "T1FBR1CTW",
+                    "bot_profile": {
+                      "id": "B039NNX8GRH",
+                      "deleted": false,
+                      "name": "Reliably",
+                      "updated": 1676033731,
+                      "app_id": "A039KSG18TX",
+                      "icons": {
+                        "image_36": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_36.png",
+                        "image_48": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_48.png",
+                        "image_72": "https://avatars.slack-edge.com/2023-02-10/4783667364754_b7e9046da8d775791dd7_72.png"
+                      },
+                      "team_id": "T1FBR1CTW"
+                    },
+                    "thread_ts": "1719909565.574899",
+                    "reply_count": 11,
+                    "reply_users_count": 1,
+                    "latest_reply": "1719909606.806499",
+                    "reply_users": [
+                      "U03A1BN3RDX"
+                    ],
+                    "is_locked": false,
+                    "subscribed": false,
+                    "attachments": [
+                      {
+                        "id": 1,
+                        "blocks": [
+                          {
+                            "type": "section",
+                            "block_id": "6VYHf",
+                            "text": {
+                              "type": "mrkdwn",
+                              "text": "*Delete pods labelled app=producer and review impacts*",
+                              "verbatim": false
+                            }
+                          },
+                          {
+                            "type": "context",
+                            "block_id": "vecnC",
+                            "elements": [
+                              {
+                                "type": "mrkdwn",
+                                "text": "*Host:* fv-az1020-770\n*State:* Completed successfully",
+                                "verbatim": false
+                              }
+                            ]
+                          }
+                        ],
+                        "color": "#06FF00",
+                        "fallback": "Experiment is finished"
+                      }
+                    ],
+                    "blocks": [
+                      {
+                        "type": "rich_text",
+                        "block_id": "3v+u",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "type": "text",
+                                "text": "Experiment is finished"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "threads": {}
+              }
+            ],
+            "users": {}
+          }
+        }
+      }
+    ],
+    "description": "This experiment will perform an operation against your system. As this action may cause issues, we suggest you play it against a non-production environment first. These kind of experiments allow you to learn how your system reacts to a given change in its state.",
+    "configuration": {
+      "ns_M001": {
+        "key": "RELIABLY_PARAM_NS_M001",
+        "type": "env",
+        "default": "default",
+        "env_var_type": "str"
+      },
+      "ns_M003": {
+        "key": "RELIABLY_PARAM_NS_M003",
+        "type": "env",
+        "default": "default",
+        "env_var_type": "str"
+      },
+      "ns_M004": {
+        "key": "RELIABLY_PARAM_NS_M004",
+        "type": "env",
+        "default": "default",
+        "env_var_type": "str"
+      },
+      "all_M001": {
+        "key": "RELIABLY_PARAM_ALL_M001",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "qps_W005": {
+        "key": "RELIABLY_PARAM_QPS_W005",
+        "type": "env",
+        "default": 10,
+        "env_var_type": "int"
+      },
+      "qty_M001": {
+        "key": "RELIABLY_PARAM_QTY_M001",
+        "type": "env",
+        "default": 2,
+        "env_var_type": "int"
+      },
+      "url_W005": {
+        "key": "RELIABLY_PARAM_URL_W005",
+        "type": "env",
+        "default": "https://demo.reliably.dev/consumer/data",
+        "env_var_type": "str"
+      },
+      "body_W005": {
+        "key": "RELIABLY_PARAM_BODY_W005",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "host_W005": {
+        "key": "RELIABLY_PARAM_HOST_W005",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "last_M003": {
+        "key": "RELIABLY_PARAM_LAST_M003",
+        "type": "env",
+        "default": "60 seconds",
+        "env_var_type": "str"
+      },
+      "last_M004": {
+        "key": "RELIABLY_PARAM_LAST_M004",
+        "type": "env",
+        "default": "60 seconds",
+        "env_var_type": "str"
+      },
+      "mode_M001": {
+        "key": "RELIABLY_PARAM_MODE_M001",
+        "type": "env",
+        "default": "fixed",
+        "env_var_type": "str"
+      },
+      "rand_M001": {
+        "key": "RELIABLY_PARAM_RAND_M001",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "order_M001": {
+        "key": "RELIABLY_PARAM_ORDER_M001",
+        "type": "env",
+        "default": "alphabetic",
+        "env_var_type": "str"
+      },
+      "method_W005": {
+        "key": "RELIABLY_PARAM_METHOD_W005",
+        "type": "env",
+        "default": "GET",
+        "env_var_type": "str"
+      },
+      "headers_W005": {
+        "key": "RELIABLY_PARAM_HEADERS_W005",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "duration_M002": {
+        "key": "RELIABLY_PARAM_DURATION_M002",
+        "type": "env",
+        "default": 30,
+        "env_var_type": "int"
+      },
+      "duration_W005": {
+        "key": "RELIABLY_PARAM_DURATION_W005",
+        "type": "env",
+        "default": 60,
+        "env_var_type": "int"
+      },
+      "insecure_W005": {
+        "key": "RELIABLY_PARAM_INSECURE_W005",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "test_name_H005": {
+        "key": "RELIABLY_PARAM_TEST_NAME_H005",
+        "type": "env",
+        "default": "load test",
+        "env_var_type": "str"
+      },
+      "test_name_W005": {
+        "key": "RELIABLY_PARAM_TEST_NAME_W005",
+        "type": "env",
+        "default": "load test",
+        "env_var_type": "str"
+      },
+      "lower_than_H005": {
+        "key": "RELIABLY_PARAM_LOWER_THAN_H005",
+        "type": "env",
+        "default": 0.5,
+        "env_var_type": "float"
+      },
+      "percentile_H005": {
+        "key": "RELIABLY_PARAM_PERCENTILE_H005",
+        "type": "env",
+        "default": "p99",
+        "env_var_type": "str"
+      },
+      "content_type_W005": {
+        "key": "RELIABLY_PARAM_CONTENT_TYPE_W005",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "grace_period_M001": {
+        "key": "RELIABLY_PARAM_GRACE_PERIOD_M001",
+        "type": "env",
+        "default": -1,
+        "env_var_type": "int"
+      },
+      "from_previous_M003": {
+        "key": "RELIABLY_PARAM_FROM_PREVIOUS_M003",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "from_previous_M004": {
+        "key": "RELIABLY_PARAM_FROM_PREVIOUS_M004",
+        "type": "env",
+        "default": false,
+        "env_var_type": "bool"
+      },
+      "container_name_M003": {
+        "key": "RELIABLY_PARAM_CONTAINER_NAME_M003",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "container_name_M004": {
+        "key": "RELIABLY_PARAM_CONTAINER_NAME_M004",
+        "type": "env",
+        "default": "",
+        "env_var_type": "str"
+      },
+      "label_selector_M001": {
+        "key": "RELIABLY_PARAM_LABEL_SELECTOR_M001",
+        "type": "env",
+        "default": "app=producer",
+        "env_var_type": "str"
+      },
+      "label_selector_M003": {
+        "key": "RELIABLY_PARAM_LABEL_SELECTOR_M003",
+        "type": "env",
+        "default": "app=producer",
+        "env_var_type": "str"
+      },
+      "label_selector_M004": {
+        "key": "RELIABLY_PARAM_LABEL_SELECTOR_M004",
+        "type": "env",
+        "default": "app=consumer",
+        "env_var_type": "str"
+      },
+      "slack_extra": [
+        "<https://app.reliably.com/executions/view/?id=5407e19e-cb4b-4ef2-8f45-d7e6ffc3dd1c&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c|View Reliably Execution>"
+      ]
+    },
+    "contributions": {
+      "errors": "high",
+      "latency": "high",
+      "security": "none",
+      "availability": "high"
+    },
+    "steady-state-hypothesis": {
+      "title": "Steady-State Hypothesis",
+      "probes": []
+    }
+  },
+  "start": "2024-07-02T08:39:24.112053+00:00",
+  "status": "completed",
+  "deviated": false,
+  "steady_states": {
+    "before": null,
+    "after": null,
+    "during": []
+  },
+  "run": [
+    {
+      "activity": {
+        "name": "Run mild traffic into consumer service",
+        "type": "action",
+        "provider": {
+          "func": "run_load_test",
+          "type": "python",
+          "module": "chaosreliably.activities.load.actions",
+          "arguments": {
+            "qps": "${qps_W005}",
+            "url": "${url_W005}",
+            "body": "${body_W005}",
+            "host": "${host_W005}",
+            "method": "${method_W005}",
+            "headers": "${headers_W005}",
+            "duration": "${duration_W005}",
+            "insecure": "${insecure_W005}",
+            "test_name": "${test_name_W005}",
+            "content_type": "${content_type_W005}"
+          }
+        },
+        "background": true
+      },
+      "output": null,
+      "start": "2024-07-02T08:39:25.745370+00:00",
+      "status": "failed",
+      "exception": [
+        "Traceback (most recent call last):\n",
+        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py\", line 56, in run_python_activity\n    return func(**arguments)\n           ^^^^^^^^^^^^^^^^^\n",
+        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py\", line 205, in run_load_test\n    raise ActivityFailed(\"missing load test dependency\")\n",
+        "chaoslib.exceptions.ActivityFailed: missing load test dependency\n",
+        "\nDuring handling of the above exception, another exception occurred:\n\n",
+        "chaoslib.exceptions.ActivityFailed: chaoslib.exceptions.ActivityFailed: missing load test dependency\n"
+      ],
+      "end": "2024-07-02T08:39:26.502548+00:00",
+      "duration": 0.757178
+    },
+    {
+      "activity": {
+        "name": "Delete all pods labelled app=producer",
+        "type": "action",
+        "provider": {
+          "func": "terminate_pods",
+          "type": "python",
+          "module": "chaosk8s.pod.actions",
+          "arguments": {
+            "ns": "${ns_M001}",
+            "all": "${all_M001}",
+            "qty": "${qty_M001}",
+            "mode": "${mode_M001}",
+            "rand": "${rand_M001}",
+            "order": "${order_M001}",
+            "grace_period": "${grace_period_M001}",
+            "label_selector": "${label_selector_M001}"
+          }
+        },
+        "background": false
+      },
+      "output": [
+        "producer-7dbb7d45b4-ngpg6",
+        "producer-7dbb7d45b4-qz9lh"
+      ],
+      "start": "2024-07-02T08:39:26.862779+00:00",
+      "status": "succeeded",
+      "end": "2024-07-02T08:39:28.029969+00:00",
+      "duration": 1.16719
+    },
+    {
+      "activity": {
+        "name": "pause-execution",
+        "type": "action",
+        "provider": {
+          "func": "pause_execution",
+          "type": "python",
+          "module": "chaosreliably.activities.pauses",
+          "arguments": {
+            "duration": "${duration_M002}"
+          }
+        }
+      },
+      "output": null,
+      "start": "2024-07-02T08:39:28.962452+00:00",
+      "status": "succeeded",
+      "end": "2024-07-02T08:39:59.921506+00:00",
+      "duration": 30.959054
+    },
+    {
+      "activity": {
+        "name": "Get logs for producer pods",
+        "type": "probe",
+        "provider": {
+          "func": "read_pod_logs",
+          "type": "python",
+          "module": "chaosk8s.pod.probes",
+          "arguments": {
+            "ns": "${ns_M003}",
+            "last": "${last_M003}",
+            "from_previous": "${from_previous_M003}",
+            "container_name": "${container_name_M003}",
+            "label_selector": "${label_selector_M003}"
+          }
+        }
+      },
+      "output": {
+        "producer-7dbb7d45b4-52lt8": "2024-07-02T08:39:32.617691318Z [2024-07-02 08:39:32 +0000] [1] [INFO] Starting gunicorn 22.0.0\n2024-07-02T08:39:32.618095276Z [2024-07-02 08:39:32 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)\n2024-07-02T08:39:32.618124760Z [2024-07-02 08:39:32 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker\n2024-07-02T08:39:32.621157433Z [2024-07-02 08:39:32 +0000] [7] [INFO] Booting worker with pid: 7\n2024-07-02T08:39:32.717020359Z [2024-07-02 08:39:32 +0000] [8] [INFO] Booting worker with pid: 8\n2024-07-02T08:39:50.616191797Z 2024-07-02 08:39:50,615:INFO:Configuring OTEL main\n2024-07-02T08:39:50.625020518Z 2024-07-02 08:39:50,624:INFO:Configuring OTEL main\n2024-07-02T08:39:50.826217772Z 2024-07-02 08:39:50,826:INFO:{\n2024-07-02T08:39:50.826239788Z   \"attributes\": {\n2024-07-02T08:39:50.826243658Z     \"telemetry.sdk.language\": \"python\",\n2024-07-02T08:39:50.826246627Z     \"telemetry.sdk.name\": \"opentelemetry\",\n2024-07-02T08:39:50.826249521Z     \"telemetry.sdk.version\": \"1.24.0\",\n2024-07-02T08:39:50.826252355Z     \"service.name\": \"producer\",\n2024-07-02T08:39:50.826255168Z     \"cloud.account.id\": \"staging10022023\",\n2024-07-02T08:39:50.826258173Z     \"cloud.provider\": \"gcp\",\n2024-07-02T08:39:50.826277195Z     \"cloud.zone\": \"europe-west1-c\",\n2024-07-02T08:39:50.826280525Z     \"k8s.cluster.name\": \"cluster-1\",\n2024-07-02T08:39:50.826283491Z     \"k8s.namespace.name\": \"default\",\n2024-07-02T08:39:50.826286445Z     \"k8s.pod.name\": \"producer-7dbb7d45b4-52lt8\",\n2024-07-02T08:39:50.826289491Z     \"host.id\": 8090662930616851282,\n2024-07-02T08:39:50.826295203Z     \"gcp.resource_type\": \"gke_container\"\n2024-07-02T08:39:50.826298328Z   },\n2024-07-02T08:39:50.826301745Z   \"schema_url\": \"\"\n2024-07-02T08:39:50.826304716Z }\n2024-07-02T08:39:50.830866991Z 2024-07-02 08:39:50,830:INFO:{\n2024-07-02T08:39:50.830882556Z   \"attributes\": {\n2024-07-02T08:39:50.830886962Z     \"telemetry.sdk.language\": \"python\",\n2024-07-02T08:39:50.830890000Z     \"telemetry.sdk.name\": \"opentelemetry\",\n2024-07-02T08:39:50.830893022Z     \"telemetry.sdk.version\": \"1.24.0\",\n2024-07-02T08:39:50.830896262Z     \"service.name\": \"producer\",\n2024-07-02T08:39:50.830899250Z     \"cloud.account.id\": \"staging10022023\",\n2024-07-02T08:39:50.830902415Z     \"cloud.provider\": \"gcp\",\n2024-07-02T08:39:50.830905515Z     \"cloud.zone\": \"europe-west1-c\",\n2024-07-02T08:39:50.830908650Z     \"k8s.cluster.name\": \"cluster-1\",\n2024-07-02T08:39:50.830921443Z     \"k8s.namespace.name\": \"default\",\n2024-07-02T08:39:50.830924883Z     \"k8s.pod.name\": \"producer-7dbb7d45b4-52lt8\",\n2024-07-02T08:39:50.830927908Z     \"host.id\": 8090662930616851282,\n2024-07-02T08:39:50.830930914Z     \"gcp.resource_type\": \"gke_container\"\n2024-07-02T08:39:50.830934003Z   },\n2024-07-02T08:39:50.830937102Z   \"schema_url\": \"\"\n2024-07-02T08:39:50.830940129Z }\n2024-07-02T08:39:51.230730613Z 2024-07-02 08:39:51,230:INFO:Configured OTEL staging10022023\n2024-07-02T08:39:51.241713085Z 2024-07-02 08:39:51,241:INFO:Configured OTEL staging10022023\n2024-07-02T08:39:51.718730213Z [2024-07-02 08:39:51 +0000] [7] [INFO] Started server process [7]\n2024-07-02T08:39:51.719143049Z [2024-07-02 08:39:51 +0000] [7] [INFO] Waiting for application startup.\n2024-07-02T08:39:51.719911888Z [2024-07-02 08:39:51 +0000] [7] [INFO] Application startup complete.\n2024-07-02T08:39:51.720336695Z [2024-07-02 08:39:51 +0000] [8] [INFO] Started server process [8]\n2024-07-02T08:39:51.720352765Z [2024-07-02 08:39:51 +0000] [8] [INFO] Waiting for application startup.\n2024-07-02T08:39:51.720894339Z [2024-07-02 08:39:51 +0000] [8] [INFO] Application startup complete.\n2024-07-02T08:39:52.015508173Z 35.191.223.97:49220 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.016049666Z 35.191.195.183:33400 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.016770348Z 35.191.195.176:51544 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.017179468Z 10.236.1.1:35858 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.017370991Z 35.191.195.181:57802 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.122612821Z 10.236.1.12:39770 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:52.526789706Z 10.236.1.12:39784 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:52.741900259Z 35.191.195.176:56648 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.890660047Z 10.236.1.12:39794 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:53.102417629Z 35.191.195.183:33410 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.193189318Z 35.191.223.97:45984 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.297518846Z 10.236.1.12:39806 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:53.427936731Z 35.191.195.181:37268 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.518757084Z 10.236.1.15:49424 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:53.893563765Z 10.236.1.15:49438 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:54.093229609Z 10.236.1.12:39820 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:54.295279909Z 10.236.1.12:39832 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:54.492162977Z 10.236.1.15:49444 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.094668165Z 10.236.1.12:39018 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.291849636Z 10.236.1.15:43648 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.492857244Z 10.236.1.12:39024 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.718875175Z 10.236.1.12:39034 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.889116852Z 10.236.1.15:43658 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:56.090380498Z 10.236.1.15:43668 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:56.293172585Z 10.236.1.12:39042 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:56.492363159Z 10.236.1.15:43674 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:56.690493072Z 10.236.1.15:43688 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:56.928834321Z 10.236.1.15:43700 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:57.691446420Z 10.236.1.12:39088 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:57.741864508Z 35.191.195.176:56652 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.892733700Z 10.236.1.12:39092 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:58.088164026Z 10.236.1.15:43714 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:58.102599387Z 35.191.195.183:51178 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.193027064Z 35.191.223.97:45998 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.428130807Z 35.191.195.181:37276 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.490172013Z 10.236.1.15:43734 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:58.689359650Z 10.236.1.15:43738 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:59.291755349Z 10.236.1.15:43740 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:59.463893373Z 10.236.1.1:36738 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:59.464929773Z 10.236.1.1:36728 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:59.490780190Z 10.236.1.12:39128 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:59.726234656Z 10.236.1.15:43744 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:59.891213656Z 10.236.1.15:43760 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.095038093Z 10.236.1.15:43762 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.291114546Z 10.236.1.12:39140 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.493068369Z 10.236.1.15:43764 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.693645831Z 10.236.1.15:43772 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.927013948Z 10.236.1.12:39148 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:01.495226089Z 10.236.1.12:39162 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:01.890841993Z 10.236.1.12:39182 - \"GET /producer HTTP/1.1\" 200\n",
+        "producer-7dbb7d45b4-cnxnj": "2024-07-02T08:39:31.842699669Z [2024-07-02 08:39:31 +0000] [1] [INFO] Starting gunicorn 22.0.0\n2024-07-02T08:39:31.843088196Z [2024-07-02 08:39:31 +0000] [1] [INFO] Listening at: http://0.0.0.0:8080 (1)\n2024-07-02T08:39:31.843123132Z [2024-07-02 08:39:31 +0000] [1] [INFO] Using worker: uvicorn.workers.UvicornWorker\n2024-07-02T08:39:31.917902881Z [2024-07-02 08:39:31 +0000] [7] [INFO] Booting worker with pid: 7\n2024-07-02T08:39:32.018683044Z [2024-07-02 08:39:32 +0000] [8] [INFO] Booting worker with pid: 8\n2024-07-02T08:39:54.020755984Z 2024-07-02 08:39:54,020:INFO:Configuring OTEL main\n2024-07-02T08:39:54.026344577Z 2024-07-02 08:39:54,026:INFO:Configuring OTEL main\n2024-07-02T08:39:54.233906640Z 2024-07-02 08:39:54,233:INFO:{\n2024-07-02T08:39:54.233949297Z   \"attributes\": {\n2024-07-02T08:39:54.233955869Z     \"telemetry.sdk.language\": \"python\",\n2024-07-02T08:39:54.233960107Z     \"telemetry.sdk.name\": \"opentelemetry\",\n2024-07-02T08:39:54.233964157Z     \"telemetry.sdk.version\": \"1.24.0\",\n2024-07-02T08:39:54.233967879Z     \"service.name\": \"producer\",\n2024-07-02T08:39:54.233971570Z     \"cloud.account.id\": \"staging10022023\",\n2024-07-02T08:39:54.233975180Z     \"cloud.provider\": \"gcp\",\n2024-07-02T08:39:54.233978974Z     \"cloud.zone\": \"europe-west1-d\",\n2024-07-02T08:39:54.233982484Z     \"k8s.cluster.name\": \"cluster-1\",\n2024-07-02T08:39:54.233986246Z     \"k8s.namespace.name\": \"default\",\n2024-07-02T08:39:54.233990119Z     \"k8s.pod.name\": \"producer-7dbb7d45b4-cnxnj\",\n2024-07-02T08:39:54.233994124Z     \"host.id\": 6441933579635562527,\n2024-07-02T08:39:54.233998072Z     \"gcp.resource_type\": \"gke_container\"\n2024-07-02T08:39:54.234001913Z   },\n2024-07-02T08:39:54.234005841Z   \"schema_url\": \"\"\n2024-07-02T08:39:54.234010563Z }\n2024-07-02T08:39:54.320200715Z 2024-07-02 08:39:54,319:INFO:{\n2024-07-02T08:39:54.320266255Z   \"attributes\": {\n2024-07-02T08:39:54.320274341Z     \"telemetry.sdk.language\": \"python\",\n2024-07-02T08:39:54.320278525Z     \"telemetry.sdk.name\": \"opentelemetry\",\n2024-07-02T08:39:54.320282108Z     \"telemetry.sdk.version\": \"1.24.0\",\n2024-07-02T08:39:54.320285989Z     \"service.name\": \"producer\",\n2024-07-02T08:39:54.320289635Z     \"cloud.account.id\": \"staging10022023\",\n2024-07-02T08:39:54.320293398Z     \"cloud.provider\": \"gcp\",\n2024-07-02T08:39:54.320297938Z     \"cloud.zone\": \"europe-west1-d\",\n2024-07-02T08:39:54.320301640Z     \"k8s.cluster.name\": \"cluster-1\",\n2024-07-02T08:39:54.320305409Z     \"k8s.namespace.name\": \"default\",\n2024-07-02T08:39:54.320309460Z     \"k8s.pod.name\": \"producer-7dbb7d45b4-cnxnj\",\n2024-07-02T08:39:54.320329222Z     \"host.id\": 6441933579635562527,\n2024-07-02T08:39:54.320334813Z     \"gcp.resource_type\": \"gke_container\"\n2024-07-02T08:39:54.320338564Z   },\n2024-07-02T08:39:54.320342378Z   \"schema_url\": \"\"\n2024-07-02T08:39:54.320346280Z }\n2024-07-02T08:39:54.744037115Z 2024-07-02 08:39:54,743:INFO:Configured OTEL staging10022023\n2024-07-02T08:39:54.814998895Z 2024-07-02 08:39:54,814:INFO:Configured OTEL staging10022023\n2024-07-02T08:39:55.423363939Z [2024-07-02 08:39:55 +0000] [7] [INFO] Started server process [7]\n2024-07-02T08:39:55.423850850Z [2024-07-02 08:39:55 +0000] [7] [INFO] Waiting for application startup.\n2024-07-02T08:39:55.423873199Z [2024-07-02 08:39:55 +0000] [8] [INFO] Started server process [8]\n2024-07-02T08:39:55.424077642Z [2024-07-02 08:39:55 +0000] [8] [INFO] Waiting for application startup.\n2024-07-02T08:39:55.424799538Z [2024-07-02 08:39:55 +0000] [7] [INFO] Application startup complete.\n2024-07-02T08:39:55.424819395Z [2024-07-02 08:39:55 +0000] [8] [INFO] Application startup complete.\n2024-07-02T08:39:55.727762277Z 35.191.195.132:53374 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.727968853Z 35.191.195.131:50080 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.728998446Z 35.191.195.129:34578 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.729364463Z 10.236.0.1:56624 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.242489734Z 10.236.0.1:58322 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.242516861Z 10.236.0.1:58324 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.158197112Z 35.191.195.132:53388 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.268659788Z 35.191.195.131:50086 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.700552969Z 35.191.195.129:47020 - \"GET /health HTTP/1.1\" 200\n",
+        "producer-7dbb7d45b4-wvsnf": "2024-07-02T08:39:04.100116243Z 10.236.1.12:51928 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:05.840996343Z 35.191.195.131:46106 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:05.934121651Z 10.236.1.15:45646 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:06.254860659Z 35.191.195.132:47894 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:06.420676253Z 35.191.195.130:58152 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:06.493187938Z 10.236.1.15:45660 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:07.089338796Z 10.236.1.15:45674 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:07.288834079Z 10.236.1.12:53258 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:07.892679007Z 10.236.1.12:53264 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:08.293052373Z 10.236.1.12:53276 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:08.703261387Z 10.236.1.15:45708 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:09.119896919Z 10.236.1.12:53298 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:10.489815271Z 10.236.1.12:53328 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:10.690751983Z 10.236.1.15:45728 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:10.841726995Z 35.191.195.131:46128 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:10.890872414Z 10.236.1.12:53344 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:10.907760921Z 10.236.0.1:41104 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:10.907802331Z 10.236.0.1:41102 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:11.250012528Z 35.191.195.132:60480 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:11.420168602Z 35.191.195.130:58160 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:12.129397945Z 10.236.1.12:53368 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:12.690405661Z 10.236.1.15:45762 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:13.726682352Z 10.236.1.12:53434 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:14.491450704Z 10.236.1.12:53456 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:15.841692415Z 35.191.195.131:54414 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:16.249724698Z 35.191.195.132:60508 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:16.293352066Z 10.236.1.15:35410 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:16.420012492Z 35.191.195.130:58824 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:16.905743060Z 10.236.1.12:38840 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:17.324609850Z 10.236.1.15:35454 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:17.492251969Z 10.236.1.12:38848 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:17.693754905Z 10.236.1.15:35458 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:17.906268584Z 10.236.1.15:35464 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:19.130728522Z 10.236.1.15:35488 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:19.690594080Z 10.236.1.12:38888 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:20.691132119Z 10.236.1.15:35526 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:20.841375283Z 35.191.195.131:54426 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:20.891581965Z 10.236.1.15:35540 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:20.907881508Z 10.236.0.1:41380 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:20.907921682Z 10.236.0.1:41382 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:21.249568620Z 35.191.195.132:51458 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:21.420288863Z 35.191.195.130:58834 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:22.093582751Z 10.236.1.15:35584 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:22.489745615Z 10.236.1.15:35596 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:23.521211919Z 10.236.1.15:35636 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:23.891038813Z 10.236.1.15:35658 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:24.093557383Z 10.236.1.15:35666 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:24.491715039Z 10.236.1.15:35694 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:25.333702378Z 10.236.1.12:55924 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:25.491073685Z 10.236.1.12:55926 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:25.693574988Z 10.236.1.15:42534 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:25.841802743Z 35.191.195.131:54626 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:26.119885561Z 10.236.1.12:55938 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:26.249700022Z 35.191.195.132:51474 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:26.420648564Z 35.191.195.130:59916 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:27.694384519Z 10.236.1.12:55976 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:28.091847283Z 10.236.1.12:55980 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:28.355189978Z 10.236.1.15:42592 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:28.532794509Z 10.236.1.12:55986 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:28.692269731Z 10.236.1.12:55994 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:28.893197448Z 10.236.1.12:56010 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:29.091655560Z 10.236.1.12:56022 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:29.327397076Z 10.236.1.12:56038 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:29.538447488Z 10.236.1.12:56046 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:29.755248565Z 10.236.1.12:56056 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:29.944782486Z 10.236.1.15:42606 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.095466387Z 10.236.1.12:56060 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.289781231Z 10.236.1.15:42618 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.491200172Z 10.236.1.15:42630 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.842716231Z 10.236.1.15:42636 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.843748819Z 35.191.195.131:54632 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:30.893539372Z 10.236.1.12:56064 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:30.908061692Z 10.236.0.1:56152 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:30.908176875Z 10.236.0.1:56154 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:31.137080809Z 10.236.1.15:42642 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:31.249613494Z 35.191.195.132:36134 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:31.327478646Z 10.236.1.15:42654 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:31.420826991Z 35.191.195.130:59948 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:31.486377984Z 10.236.1.12:56074 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:31.726402407Z 10.236.1.12:56076 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:31.901036618Z 10.236.1.12:56086 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:32.094760130Z 10.236.1.12:56102 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:32.342257125Z 10.236.1.15:42670 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:32.491443388Z 10.236.1.15:42676 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:32.694040551Z 10.236.1.15:42682 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:32.892135420Z 10.236.1.15:42698 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:33.088726750Z 10.236.1.12:56108 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:33.360110662Z 10.236.1.12:56114 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:33.494523723Z 10.236.1.12:56128 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:33.690304946Z 10.236.1.15:42714 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:33.893904087Z 10.236.1.12:56130 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:34.091739418Z 10.236.1.15:42722 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:34.291053658Z 10.236.1.15:42732 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:34.547988796Z 10.236.1.12:56132 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:34.690587388Z 10.236.1.15:42746 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:34.894373875Z 10.236.1.15:42758 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:35.130837908Z 10.236.1.15:34682 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:35.292611175Z 10.236.1.12:48232 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:35.492128319Z 10.236.1.15:34698 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:35.690347239Z 10.236.1.12:48238 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:35.841574863Z 35.191.195.131:38090 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:35.892491878Z 10.236.1.15:34708 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:36.092551972Z 10.236.1.12:48252 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:36.249147021Z 35.191.195.132:36164 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:36.296853590Z 10.236.1.12:48266 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:36.421841694Z 35.191.195.130:49550 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:36.541566899Z 10.236.1.12:48280 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:36.692169635Z 10.236.1.12:48290 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:36.892782934Z 10.236.1.15:34724 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:37.089534877Z 10.236.1.15:34740 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:37.299479690Z 10.236.1.12:48302 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:37.526535761Z 10.236.1.15:34748 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:37.694680271Z 10.236.1.12:48304 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:37.894982704Z 10.236.1.15:34752 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:38.099041329Z 10.236.1.15:34754 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:38.297747077Z 10.236.1.12:48318 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:38.529818799Z 10.236.1.15:34768 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:38.699165400Z 10.236.1.12:48328 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:38.891730553Z 10.236.1.15:34778 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:39.099565351Z 10.236.1.12:48332 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:39.289458212Z 10.236.1.15:34790 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:39.491197906Z 10.236.1.15:34800 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:39.691387471Z 10.236.1.15:34816 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:39.893695785Z 10.236.1.15:34822 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:40.095282555Z 10.236.1.15:34830 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:40.299111850Z 10.236.1.15:34838 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:40.529787018Z 10.236.1.15:34846 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:40.688206161Z 10.236.1.15:34856 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:40.841803767Z 35.191.195.131:38098 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:40.908001571Z 10.236.0.1:56706 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:40.908093111Z 10.236.0.1:56704 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:40.946740509Z 10.236.1.12:48336 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:41.092615736Z 10.236.1.12:48338 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:41.248784163Z 35.191.195.132:36964 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:41.339207688Z 10.236.1.12:48342 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:41.423888953Z 35.191.195.130:49552 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:41.489573619Z 10.236.1.15:34858 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:41.687978399Z 10.236.1.15:34868 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:41.891465067Z 10.236.1.15:34872 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:42.087594422Z 10.236.1.15:34886 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:42.341817491Z 10.236.1.12:48352 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:42.495222673Z 10.236.1.12:48368 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:42.692076201Z 10.236.1.12:48376 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:42.891675115Z 10.236.1.12:48378 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:43.090914315Z 10.236.1.12:48390 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:43.291461867Z 10.236.1.15:34890 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:43.491364883Z 10.236.1.15:34900 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:43.739234796Z 10.236.1.12:48402 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:43.889213404Z 10.236.1.12:48414 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:44.089673057Z 10.236.1.15:34904 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:44.296669210Z 10.236.1.15:34912 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:44.489422344Z 10.236.1.12:48416 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:44.694881029Z 10.236.1.12:48432 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:44.892929250Z 10.236.1.15:34922 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:45.094972575Z 10.236.1.12:39610 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:45.334135470Z 10.236.1.15:49240 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:45.497930494Z 10.236.1.12:39612 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:45.820898293Z 10.236.1.15:49250 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:45.842194703Z 35.191.195.131:45512 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:45.901564860Z 10.236.1.12:39616 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:46.098528668Z 10.236.1.15:49254 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:46.248480593Z 35.191.195.132:36980 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:46.302940173Z 10.236.1.12:39630 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:46.423927115Z 35.191.195.130:39116 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:46.488693926Z 10.236.1.12:39642 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:46.736623209Z 10.236.1.12:39648 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:46.891258374Z 10.236.1.15:49270 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:47.095297125Z 10.236.1.12:39658 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:47.293717954Z 10.236.1.15:49272 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:47.526155688Z 10.236.1.12:39664 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:47.722019033Z 10.236.1.15:49286 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:47.896144681Z 10.236.1.15:49294 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:48.092404276Z 10.236.1.12:39666 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:48.333486385Z 10.236.1.12:39678 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:48.490288176Z 10.236.1.12:39688 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:48.694241298Z 10.236.1.15:49306 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:48.891440490Z 10.236.1.12:39698 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:49.094101726Z 10.236.1.15:49320 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:49.291755617Z 10.236.1.12:39706 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:49.490130649Z 10.236.1.15:49334 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:49.689164880Z 10.236.1.12:39718 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:49.892998321Z 10.236.1.12:39722 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:50.092225055Z 10.236.1.12:39724 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:50.296484793Z 10.236.1.12:39734 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:50.492338881Z 10.236.1.12:39746 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:50.690579645Z 10.236.1.12:39750 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:50.842949865Z 35.191.195.131:45526 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:50.907340512Z 10.236.0.1:57128 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:50.907389418Z 10.236.0.1:57130 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:50.939665263Z 10.236.1.15:49348 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:51.090012965Z 10.236.1.15:49364 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:51.247954761Z 35.191.195.132:46108 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:51.336319140Z 10.236.1.15:49368 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:51.420826162Z 35.191.195.130:39132 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:51.489635031Z 10.236.1.12:39764 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:51.693856010Z 10.236.1.15:49382 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:51.942794610Z 10.236.1.15:49398 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:52.327285170Z 10.236.1.12:39780 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:52.688615847Z 10.236.1.12:39788 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:53.092819693Z 10.236.1.15:49412 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:53.690514126Z 10.236.1.15:49428 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:54.690095943Z 10.236.1.12:39836 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:54.925877786Z 10.236.1.12:39012 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:55.843189931Z 35.191.195.131:45292 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:56.247972468Z 35.191.195.132:46116 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:56.420226782Z 35.191.195.130:54110 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.090758842Z 10.236.1.12:39058 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:57.294188226Z 10.236.1.12:39074 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:57.490909744Z 10.236.1.15:43702 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:58.300743828Z 10.236.1.15:43724 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:58.890974803Z 10.236.1.12:39108 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:39:59.091123749Z 10.236.1.12:39122 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:00.845239531Z 35.191.195.131:45326 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.907162923Z 10.236.0.1:37040 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.907222056Z 10.236.0.1:37042 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:01.097247303Z 10.236.1.15:43778 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:01.248664574Z 35.191.195.132:37868 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:01.297812465Z 10.236.1.15:43792 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:01.420195111Z 35.191.195.130:54116 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:01.691137566Z 10.236.1.12:39176 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:02.126740260Z 10.236.1.12:39194 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:02.333174123Z 10.236.1.15:43806 - \"GET /producer HTTP/1.1\" 200\n2024-07-02T08:40:02.490208806Z 10.236.1.15:43814 - \"GET /producer HTTP/1.1\" 200\n"
+      },
+      "start": "2024-07-02T08:40:01.236275+00:00",
+      "status": "succeeded",
+      "end": "2024-07-02T08:40:02.863007+00:00",
+      "duration": 1.626732
+    },
+    {
+      "activity": {
+        "name": "Get logs for consumer pods",
+        "type": "probe",
+        "provider": {
+          "func": "read_pod_logs",
+          "type": "python",
+          "module": "chaosk8s.pod.probes",
+          "arguments": {
+            "ns": "${ns_M004}",
+            "last": "${last_M004}",
+            "from_previous": "${from_previous_M004}",
+            "container_name": "${container_name_M004}",
+            "label_selector": "${label_selector_M004}"
+          }
+        }
+      },
+      "output": {
+        "consumer-7444c4959c-87w5w": "2024-07-02T08:39:06.321007234Z 2024-07-02 08:39:06,320:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:06.321791855Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:06.494100366Z 2024-07-02 08:39:06,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:06.494909249Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:06.816901099Z 35.191.195.183:49152 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:06.898985399Z 2024-07-02 08:39:06,898:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:06.899696494Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:06.962928375Z 35.191.223.96:40440 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:07.090101052Z 2024-07-02 08:39:07,089:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:07.090903098Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.491684232Z 2024-07-02 08:39:07,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:07.492528567Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.626167006Z 10.236.1.1:36318 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:07.626547448Z 10.236.1.1:36316 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:07.703517418Z 35.191.195.180:35136 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:07.730959467Z 35.191.195.177:42060 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:08.496268366Z 2024-07-02 08:39:08,496:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:08.497166866Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:08.704199940Z 2024-07-02 08:39:08,703:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:08.705024845Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:09.490911437Z 2024-07-02 08:39:09,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:09.491938317Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:10.092027861Z 2024-07-02 08:39:10,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:10.114909614Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:10.691595553Z 2024-07-02 08:39:10,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:10.692377153Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.090452308Z 2024-07-02 08:39:11,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:11.091178037Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.292716355Z 2024-07-02 08:39:11,292:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:11.293404810Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.700242395Z 2024-07-02 08:39:11,700:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:11.700950641Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.816920154Z 35.191.195.183:49160 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:11.962390039Z 35.191.223.96:40446 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:12.691366938Z 2024-07-02 08:39:12,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:12.692184312Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.715473347Z 35.191.195.180:35152 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:12.731052259Z 35.191.195.177:42078 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:13.892210778Z 2024-07-02 08:39:13,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:13.892945508Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:14.730404871Z 2024-07-02 08:39:14,730:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:14.731107110Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:15.128316903Z 2024-07-02 08:39:15,128:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:15.129100473Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:15.497182991Z 2024-07-02 08:39:15,496:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:15.498007641Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:15.693780735Z 2024-07-02 08:39:15,693:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:15.694501280Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.091911971Z 2024-07-02 08:39:16,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:16.092796066Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.294138750Z 2024-07-02 08:39:16,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:16.294891727Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.491521256Z 2024-07-02 08:39:16,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:16.492351061Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.693740541Z 2024-07-02 08:39:16,693:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:16.694470349Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.816910131Z 35.191.195.183:39910 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:16.962257628Z 35.191.223.96:53284 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:17.118696276Z 2024-07-02 08:39:17,118:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:17.119377283Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:17.325438770Z 2024-07-02 08:39:17,325:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:17.326151130Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:17.625646050Z 10.236.1.1:44750 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:17.625726903Z 10.236.1.1:44748 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:17.715594894Z 2024-07-02 08:39:17,715:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:17.716148569Z 35.191.195.180:52110 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:17.716462766Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:17.730480817Z 35.191.195.177:44512 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:17.907174235Z 2024-07-02 08:39:17,906:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:17.915502994Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:18.301447611Z 2024-07-02 08:39:18,301:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:18.302338589Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:18.490095185Z 2024-07-02 08:39:18,489:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:18.490814406Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:19.131571042Z 2024-07-02 08:39:19,131:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:19.132345243Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:19.293281634Z 2024-07-02 08:39:19,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:19.293965962Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.095547017Z 2024-07-02 08:39:20,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:20.096252866Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.291336746Z 2024-07-02 08:39:20,291:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:20.292035057Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.691989499Z 2024-07-02 08:39:20,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:20.692735801Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.892371504Z 2024-07-02 08:39:20,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:20.893130983Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:21.491417274Z 2024-07-02 08:39:21,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:21.515674283Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:21.720411008Z 2024-07-02 08:39:21,720:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:21.721106315Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:21.816451411Z 35.191.195.183:39918 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:21.923947603Z 2024-07-02 08:39:21,923:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:21.924678363Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:21.962312018Z 35.191.223.96:53298 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:22.115339539Z 2024-07-02 08:39:22,115:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:22.116297497Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:22.324462076Z 2024-07-02 08:39:22,324:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:22.325197033Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:22.490572990Z 2024-07-02 08:39:22,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:22.491349651Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:22.704608112Z 35.191.195.180:52124 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:22.731377660Z 35.191.195.177:44522 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:22.891596425Z 2024-07-02 08:39:22,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:22.892400224Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:23.095874339Z 2024-07-02 08:39:23,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:23.096679386Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:23.318864291Z 2024-07-02 08:39:23,318:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:23.319662809Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:23.521982668Z 2024-07-02 08:39:23,521:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:23.522723995Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:23.690235779Z 2024-07-02 08:39:23,689:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:23.691100336Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:23.891796353Z 2024-07-02 08:39:23,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:23.892556809Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:24.094280134Z 2024-07-02 08:39:24,094:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:24.095042562Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:24.291311246Z 2024-07-02 08:39:24,291:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:24.292070968Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:24.492537591Z 2024-07-02 08:39:24,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:24.494346040Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.694417548Z 2024-07-02 08:39:25,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:25.695202624Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.894116136Z 2024-07-02 08:39:25,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:25.894863456Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:26.294766134Z 2024-07-02 08:39:26,294:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:26.295439717Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:26.711611573Z 2024-07-02 08:39:26,711:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:26.712544801Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:26.816419057Z 35.191.195.183:47658 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:26.961762103Z 35.191.223.96:42068 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:27.095977571Z 2024-07-02 08:39:27,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:27.096767196Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.295991410Z 2024-07-02 08:39:27,295:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:27.296732505Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.625232501Z 10.236.1.1:53478 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:27.625266802Z 10.236.1.1:53480 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:27.705114877Z 35.191.195.180:43382 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:27.731059232Z 35.191.195.177:46648 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:28.348258961Z 2024-07-02 08:39:28,346:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:28.348557959Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:29.945683298Z 2024-07-02 08:39:29,945:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:29.946832299Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:30.290573909Z 2024-07-02 08:39:30,290:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:30.291488113Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:30.491993447Z 2024-07-02 08:39:30,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:30.492835233Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:30.845367587Z 2024-07-02 08:39:30,845:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:30.846239623Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.138608741Z 2024-07-02 08:39:31,138:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:31.139825934Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.328722152Z 2024-07-02 08:39:31,328:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:31.329602795Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.816198305Z 35.191.195.183:47668 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:31.960794007Z 35.191.223.96:42080 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:32.343413242Z 2024-07-02 08:39:32,343:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:32.344575021Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:32.492221703Z 2024-07-02 08:39:32,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:32.493154759Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:32.694931319Z 2024-07-02 08:39:32,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:32.695602956Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:32.705149860Z 35.191.195.180:43394 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:32.730763433Z 35.191.195.177:46656 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:32.892881401Z 2024-07-02 08:39:32,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:32.893542968Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:33.691236390Z 2024-07-02 08:39:33,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:33.692011511Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:34.092531700Z 2024-07-02 08:39:34,092:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:34.093289542Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:34.291954643Z 2024-07-02 08:39:34,291:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:34.292659038Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:34.691410734Z 2024-07-02 08:39:34,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:34.692226697Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:34.895172902Z 2024-07-02 08:39:34,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:34.895942695Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:35.131876610Z 2024-07-02 08:39:35,131:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:35.132957820Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:35.493023318Z 2024-07-02 08:39:35,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:35.493751898Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:35.893425146Z 2024-07-02 08:39:35,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:35.894085613Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.816310141Z 35.191.195.183:44334 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:36.893592948Z 2024-07-02 08:39:36,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:36.894415224Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.960238461Z 35.191.223.96:45182 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:37.090358410Z 2024-07-02 08:39:37,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:37.091085403Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:37.528260584Z 2024-07-02 08:39:37,528:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:37.532223616Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:37.628051804Z 10.236.1.1:53634 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:37.628106855Z 10.236.1.1:53632 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:37.705692334Z 35.191.195.180:60342 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:37.730359609Z 35.191.195.177:44096 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:37.895958776Z 2024-07-02 08:39:37,895:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:37.896562169Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:38.099811325Z 2024-07-02 08:39:38,099:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:38.100550644Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:38.530740382Z 2024-07-02 08:39:38,530:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:38.531466070Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:38.892541502Z 2024-07-02 08:39:38,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:38.893194559Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.290536877Z 2024-07-02 08:39:39,290:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:39.291287280Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.492183846Z 2024-07-02 08:39:39,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:39.492968820Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.692242791Z 2024-07-02 08:39:39,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:39.693020044Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.894380410Z 2024-07-02 08:39:39,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:39.895070654Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:40.096085817Z 2024-07-02 08:39:40,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:40.096828462Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:40.300102319Z 2024-07-02 08:39:40,299:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:40.300826948Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:40.532402481Z 2024-07-02 08:39:40,532:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:40.533231128Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:40.689015637Z 2024-07-02 08:39:40,688:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:40.689759182Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.490298322Z 2024-07-02 08:39:41,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:41.491129194Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.689034863Z 2024-07-02 08:39:41,688:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:41.689917521Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.817828536Z 35.191.195.183:44336 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:41.891844155Z 2024-07-02 08:39:41,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:41.892664774Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.960020633Z 35.191.223.96:45192 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:42.088460686Z 2024-07-02 08:39:42,088:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:42.089260481Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.705660004Z 35.191.195.180:60348 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:42.730420224Z 35.191.195.177:44098 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:43.292247317Z 2024-07-02 08:39:43,292:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:43.292936919Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:43.492168062Z 2024-07-02 08:39:43,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:43.492973973Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:44.090530223Z 2024-07-02 08:39:44,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:44.091259325Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:44.297463002Z 2024-07-02 08:39:44,297:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:44.298265820Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:44.893784049Z 2024-07-02 08:39:44,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:44.894540617Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:45.334917035Z 2024-07-02 08:39:45,334:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:45.335792431Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:45.822401523Z 2024-07-02 08:39:45,822:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:45.823626744Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.099323994Z 2024-07-02 08:39:46,099:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:46.100130604Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.817811042Z 35.191.195.183:55330 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:46.916908399Z 2024-07-02 08:39:46,916:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:46.918914734Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.959403498Z 35.191.223.96:45562 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:47.294968238Z 2024-07-02 08:39:47,294:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:47.295617068Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:47.628286615Z 10.236.1.1:39786 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:47.630296729Z 10.236.1.1:39784 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:47.717800576Z 35.191.195.180:50778 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:47.725398920Z 2024-07-02 08:39:47,725:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:47.726279913Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:47.732226911Z 35.191.195.177:34792 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:47.897051208Z 2024-07-02 08:39:47,896:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:47.897692568Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:48.695106583Z 2024-07-02 08:39:48,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:48.695822088Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:49.094977646Z 2024-07-02 08:39:49,094:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:49.095638992Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:49.490990183Z 2024-07-02 08:39:49,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:49.491754101Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:50.940496808Z 2024-07-02 08:39:50,940:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:50.941249123Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.090655385Z 2024-07-02 08:39:51,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:51.091387938Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.337092579Z 2024-07-02 08:39:51,336:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:51.337784700Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.694535825Z 2024-07-02 08:39:51,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:51.695305488Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.817884219Z 35.191.195.183:55342 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:51.944094480Z 2024-07-02 08:39:51,943:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:51.944741400Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.959097866Z 35.191.223.96:45574 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.706488684Z 35.191.195.180:50790 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:52.730670244Z 35.191.195.177:34800 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.093691865Z 2024-07-02 08:39:53,093:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:53.094445571Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:53.519571906Z 2024-07-02 08:39:53,519:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:53.520324504Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:53.691360158Z 2024-07-02 08:39:53,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:53.692182344Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:53.894340572Z 2024-07-02 08:39:53,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:53.895045502Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:54.492984604Z 2024-07-02 08:39:54,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:54.494148836Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:55.292519994Z 2024-07-02 08:39:55,292:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:55.315536115Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:55.889985199Z 2024-07-02 08:39:55,889:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:55.890783180Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.091078239Z 2024-07-02 08:39:56,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:56.091763482Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.493195194Z 2024-07-02 08:39:56,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:56.494026234Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.691215919Z 2024-07-02 08:39:56,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:56.691940683Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.816926006Z 35.191.195.183:40988 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:56.929527147Z 2024-07-02 08:39:56,929:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:56.930248094Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.958597770Z 35.191.223.96:43114 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.491758240Z 2024-07-02 08:39:57,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:57.492617447Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.626124843Z 10.236.1.1:42428 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.626283182Z 10.236.1.1:42426 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.706747747Z 35.191.195.180:34532 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:57.730687900Z 35.191.195.177:56046 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.088961513Z 2024-07-02 08:39:58,088:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:58.089750849Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:58.301560876Z 2024-07-02 08:39:58,301:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:58.302293474Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:58.490823705Z 2024-07-02 08:39:58,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:58.491494382Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:58.690096784Z 2024-07-02 08:39:58,689:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:58.690867837Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:59.292495887Z 2024-07-02 08:39:59,292:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:59.293268331Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:59.726962837Z 2024-07-02 08:39:59,726:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:59.727670773Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:59.891952033Z 2024-07-02 08:39:59,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:59.892651280Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:00.095693252Z 2024-07-02 08:40:00,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:00.096392980Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:00.493776071Z 2024-07-02 08:40:00,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:00.494465599Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:00.694351841Z 2024-07-02 08:40:00,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:00.695049061Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.098030757Z 2024-07-02 08:40:01,097:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:01.098752316Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.298548567Z 2024-07-02 08:40:01,298:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:01.299262428Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.817117286Z 35.191.195.183:41000 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:01.957811415Z 35.191.223.96:43118 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:02.334154802Z 2024-07-02 08:40:02,333:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:02.334830938Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:02.491005939Z 2024-07-02 08:40:02,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:02.491682951Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:02.698251603Z 2024-07-02 08:40:02,698:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:02.719313801Z 35.191.195.180:34536 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:02.719343260Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:02.730715644Z 35.191.195.177:56058 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:02.928716553Z 2024-07-02 08:40:02,928:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:02.929599128Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:03.093180514Z 2024-07-02 08:40:03,092:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:03.093881434Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:03.295349266Z 2024-07-02 08:40:03,295:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:03.296030500Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:03.494477260Z 2024-07-02 08:40:03,494:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:03.495290603Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:03.691480204Z 2024-07-02 08:40:03,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:03.692225241Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:04.299398367Z 2024-07-02 08:40:04,299:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:04.300184257Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:04.692428859Z 2024-07-02 08:40:04,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:04.693146750Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n",
+        "consumer-7444c4959c-w4gd8": "2024-07-02T08:39:06.695102949Z 2024-07-02 08:39:06,694:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:06.695859552Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.289795243Z 2024-07-02 08:39:07,289:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:07.290585950Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.692267916Z 2024-07-02 08:39:07,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:07.692983877Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.893590422Z 2024-07-02 08:39:07,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:07.894329285Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:07.921561108Z 35.191.195.179:44768 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:08.123228535Z 2024-07-02 08:39:08,123:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:08.123941280Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:08.207003543Z 35.191.195.183:45244 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:08.293877402Z 2024-07-02 08:39:08,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:08.294547437Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:08.889497159Z 2024-07-02 08:39:08,889:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:08.890259128Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:09.120799273Z 2024-07-02 08:39:09,120:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:09.121531169Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:09.321394861Z 2024-07-02 08:39:09,321:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:09.322127234Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:09.453196565Z 35.191.195.182:55574 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:09.690484560Z 2024-07-02 08:39:09,690:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:09.691203264Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:09.889683894Z 2024-07-02 08:39:09,889:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:09.890770756Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:10.289329706Z 2024-07-02 08:39:10,289:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:10.290014724Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:10.490639145Z 2024-07-02 08:39:10,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:10.491412013Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:10.524233120Z 35.191.223.98:52140 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:10.891741293Z 2024-07-02 08:39:10,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:10.892414450Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.489903673Z 2024-07-02 08:39:11,489:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:11.490630383Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:11.893522233Z 2024-07-02 08:39:11,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:11.894261489Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.130297866Z 2024-07-02 08:39:12,130:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:12.131077721Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.333385117Z 2024-07-02 08:39:12,333:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:12.334155489Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.490455599Z 2024-07-02 08:39:12,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:12.491284842Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.896829039Z 2024-07-02 08:39:12,896:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:12.897621687Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:12.920683980Z 35.191.195.179:40008 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:13.091166037Z 2024-07-02 08:39:13,090:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:13.092021054Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:13.207161562Z 35.191.195.183:45256 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:13.293358242Z 2024-07-02 08:39:13,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:13.294020915Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:13.494343249Z 2024-07-02 08:39:13,494:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:13.495007746Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:13.727523934Z 2024-07-02 08:39:13,727:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:13.728343245Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:14.126507138Z 2024-07-02 08:39:14,126:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:14.127252426Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:14.291014296Z 2024-07-02 08:39:14,290:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:14.291680964Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:14.454005214Z 35.191.195.182:55576 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:14.492276653Z 2024-07-02 08:39:14,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:14.493066900Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:14.889997948Z 2024-07-02 08:39:14,889:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:14.890762925Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:15.289195057Z 10.236.1.1:45754 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:15.289843505Z 10.236.1.1:45756 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:15.315526915Z 2024-07-02 08:39:15,315:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:15.316330941Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:15.523567633Z 35.191.223.98:52156 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:15.893038684Z 2024-07-02 08:39:15,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:15.893570316Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:16.906539326Z 2024-07-02 08:39:16,906:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:16.907360764Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:17.493230264Z 2024-07-02 08:39:17,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:17.493894866Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:17.920255396Z 35.191.195.179:40022 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:18.129382291Z 2024-07-02 08:39:18,129:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:18.130117768Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:18.207658896Z 35.191.195.183:48216 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:18.691644032Z 2024-07-02 08:39:18,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:18.692379386Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:18.929024062Z 2024-07-02 08:39:18,928:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:18.929729871Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:19.453500315Z 35.191.195.182:57732 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:19.490429011Z 2024-07-02 08:39:19,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:19.491529498Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:19.691398137Z 2024-07-02 08:39:19,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:19.692147758Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:19.895035229Z 2024-07-02 08:39:19,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:19.895772119Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.489803593Z 2024-07-02 08:39:20,489:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:20.490579696Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:20.522366564Z 35.191.223.98:51926 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:21.091633974Z 2024-07-02 08:39:21,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:21.092371122Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:21.291959086Z 2024-07-02 08:39:21,291:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:21.292725389Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:22.688693597Z 2024-07-02 08:39:22,688:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:22.689531024Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:22.919840369Z 35.191.195.179:54032 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:23.208085464Z 35.191.195.183:48230 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:24.453984164Z 35.191.195.182:57740 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:24.696148075Z 2024-07-02 08:39:24,695:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:24.696872962Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:24.892821731Z 2024-07-02 08:39:24,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:24.893513889Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.095202401Z 2024-07-02 08:39:25,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:25.096000045Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.322351245Z 10.236.1.1:56072 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:25.323242981Z 10.236.1.1:56086 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:25.334452747Z 2024-07-02 08:39:25,334:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:25.335216637Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.491905826Z 2024-07-02 08:39:25,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:25.492758460Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:25.522116190Z 35.191.223.98:51932 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:26.120811137Z 2024-07-02 08:39:26,120:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:26.121778815Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:26.493833293Z 2024-07-02 08:39:26,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:26.494566887Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:26.896088734Z 2024-07-02 08:39:26,895:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:26.896761787Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.499296997Z 2024-07-02 08:39:27,499:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:27.500078435Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.694178118Z 2024-07-02 08:39:27,693:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:27.694922664Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.896583422Z 2024-07-02 08:39:27,896:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:27.915563975Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:27.919177775Z 35.191.195.179:54036 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:28.092877241Z 2024-07-02 08:39:28,092:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:28.093776041Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:28.208674561Z 35.191.195.183:50940 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:28.533552731Z 2024-07-02 08:39:28,533:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:28.534147323Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:28.693018979Z 2024-07-02 08:39:28,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:28.693754522Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:28.893534314Z 2024-07-02 08:39:28,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:28.894245196Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:29.092439997Z 2024-07-02 08:39:29,092:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:29.093173453Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:29.328689640Z 2024-07-02 08:39:29,328:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:29.329414340Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:29.453234684Z 35.191.195.182:40748 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:29.540375519Z 2024-07-02 08:39:29,539:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:29.540721982Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:29.758569834Z 2024-07-02 08:39:29,757:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:29.758983835Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:30.096215551Z 2024-07-02 08:39:30,096:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:30.116067097Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:30.521975029Z 35.191.223.98:43028 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:30.894470212Z 2024-07-02 08:39:30,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:30.915667727Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.487157617Z 2024-07-02 08:39:31,486:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:31.488904365Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.727635248Z 2024-07-02 08:39:31,727:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:31.728414090Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:31.901461128Z 2024-07-02 08:39:31,901:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:31.902474257Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:32.095502675Z 2024-07-02 08:39:32,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:32.096282881Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:32.920246040Z 35.191.195.179:44062 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:33.089513540Z 2024-07-02 08:39:33,089:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:33.090169803Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:33.207141358Z 35.191.195.183:50954 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:33.360536541Z 2024-07-02 08:39:33,360:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:33.361224082Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:33.495384898Z 2024-07-02 08:39:33,495:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:33.496170318Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:33.894638585Z 2024-07-02 08:39:33,894:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:33.895386955Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:34.453805487Z 35.191.195.182:40756 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:34.548852705Z 2024-07-02 08:39:34,548:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:34.549615661Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:35.289371484Z 10.236.1.1:58702 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:35.289823134Z 10.236.1.1:58700 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:35.293351351Z 2024-07-02 08:39:35,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:35.317203085Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:35.522778888Z 35.191.223.98:43034 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:35.691401323Z 2024-07-02 08:39:35,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:35.692047945Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.093376216Z 2024-07-02 08:39:36,093:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:36.094137953Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.316436885Z 2024-07-02 08:39:36,316:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:36.317602725Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.542324587Z 2024-07-02 08:39:36,542:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:36.543142292Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:36.693128641Z 2024-07-02 08:39:36,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:36.693887255Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:37.300052006Z 2024-07-02 08:39:37,299:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:37.300803742Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:37.695278329Z 2024-07-02 08:39:37,695:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:37.696151022Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:37.924217793Z 35.191.195.179:44090 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:38.207390346Z 35.191.195.183:33038 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:38.298567500Z 2024-07-02 08:39:38,298:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:38.299386618Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:38.700116181Z 2024-07-02 08:39:38,699:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:38.700856624Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.100401507Z 2024-07-02 08:39:39,100:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:39.101209483Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:39.453912554Z 35.191.195.182:38940 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:40.521086438Z 35.191.223.98:35052 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:40.947481396Z 2024-07-02 08:39:40,947:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:40.948278519Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.093615804Z 2024-07-02 08:39:41,093:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:41.094578272Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:41.340005343Z 2024-07-02 08:39:41,339:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:41.340922184Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.342721147Z 2024-07-02 08:39:42,342:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:42.343389326Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.496069616Z 2024-07-02 08:39:42,495:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:42.496796976Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.692895487Z 2024-07-02 08:39:42,692:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:42.693636444Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.892514374Z 2024-07-02 08:39:42,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:42.893239344Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:42.919784909Z 35.191.195.179:34834 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:43.091766295Z 2024-07-02 08:39:43,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:43.092537763Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:43.207048925Z 35.191.195.183:33052 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:43.739999202Z 2024-07-02 08:39:43,739:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:43.740902844Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:43.890071606Z 2024-07-02 08:39:43,889:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:43.890765318Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:44.454031791Z 35.191.195.182:38950 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:44.490145429Z 2024-07-02 08:39:44,489:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:44.490947732Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:44.695632722Z 2024-07-02 08:39:44,695:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:44.696391767Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:45.095726890Z 2024-07-02 08:39:45,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:45.096635244Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:45.289907428Z 10.236.1.1:58400 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:45.289942651Z 10.236.1.1:58392 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:45.498785005Z 2024-07-02 08:39:45,498:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:45.499477982Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:45.520898299Z 35.191.223.98:35060 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:45.902400057Z 2024-07-02 08:39:45,902:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:45.903116978Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.303780046Z 2024-07-02 08:39:46,303:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:46.304619183Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.489519870Z 2024-07-02 08:39:46,489:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:46.490275936Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:46.737498112Z 2024-07-02 08:39:46,737:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:46.738200100Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:47.096275617Z 2024-07-02 08:39:47,096:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:47.097051496Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:47.527427361Z 2024-07-02 08:39:47,527:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:47.528761083Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:47.919749121Z 35.191.195.179:34844 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:48.093307588Z 2024-07-02 08:39:48,093:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:48.117202403Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:48.207296394Z 35.191.195.183:53526 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:48.334398424Z 2024-07-02 08:39:48,334:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:48.335312460Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:48.491084921Z 2024-07-02 08:39:48,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:48.491952143Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:48.892419208Z 2024-07-02 08:39:48,892:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:48.893212398Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:49.292580339Z 2024-07-02 08:39:49,292:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:49.293242964Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:49.453906716Z 35.191.195.182:55476 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:49.689829898Z 2024-07-02 08:39:49,689:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:49.690510591Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:49.893610898Z 2024-07-02 08:39:49,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:49.894523874Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:50.093088935Z 2024-07-02 08:39:50,092:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:50.093908940Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:50.297440797Z 2024-07-02 08:39:50,297:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:50.298226600Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:50.493052863Z 2024-07-02 08:39:50,492:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:50.493939885Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:50.522297479Z 35.191.223.98:46232 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:50.691291523Z 2024-07-02 08:39:50,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:50.692092828Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:51.490811744Z 2024-07-02 08:39:51,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:51.491557148Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.123507953Z 2024-07-02 08:39:52,123:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:52.124241369Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.328319297Z 2024-07-02 08:39:52,328:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:52.328988809Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.527645872Z 2024-07-02 08:39:52,527:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:52.528341342Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.689472124Z 2024-07-02 08:39:52,689:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:52.690245756Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.891471885Z 2024-07-02 08:39:52,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:52.892274548Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:52.919521595Z 35.191.195.179:46690 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.207561472Z 35.191.195.183:53528 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:53.298223303Z 2024-07-02 08:39:53,298:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:53.298967366Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:54.094100247Z 2024-07-02 08:39:54,093:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:54.115025634Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:54.295996013Z 2024-07-02 08:39:54,295:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:54.315625759Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:54.453667019Z 35.191.195.182:55484 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:54.691038396Z 2024-07-02 08:39:54,690:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:54.691879731Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:54.926929790Z 2024-07-02 08:39:54,926:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:54.927673848Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:55.095470302Z 2024-07-02 08:39:55,095:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:55.096253902Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:55.289064384Z 10.236.1.1:56168 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.289495859Z 10.236.1.1:56172 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.493548174Z 2024-07-02 08:39:55,493:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:55.494635447Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:55.520033283Z 35.191.223.98:46240 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:55.719570734Z 2024-07-02 08:39:55,719:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:55.720363686Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:56.293952252Z 2024-07-02 08:39:56,293:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:56.294621432Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.091548601Z 2024-07-02 08:39:57,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:57.092347190Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.295181995Z 2024-07-02 08:39:57,294:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:57.295962594Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.692175983Z 2024-07-02 08:39:57,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:57.692901448Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.893467840Z 2024-07-02 08:39:57,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:57.894210030Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:57.919664026Z 35.191.195.179:46706 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.207550152Z 35.191.195.183:36928 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:58.891822540Z 2024-07-02 08:39:58,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:58.892467106Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:59.092063783Z 2024-07-02 08:39:59,091:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:59.093015241Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:39:59.453270716Z 35.191.195.182:46364 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:39:59.491449884Z 2024-07-02 08:39:59,491:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:39:59.492173774Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:00.291886226Z 2024-07-02 08:40:00,291:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:00.292618138Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:00.519425071Z 35.191.223.98:32866 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:00.927745057Z 2024-07-02 08:40:00,927:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:00.928497167Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.496142946Z 2024-07-02 08:40:01,495:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:01.496866719Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.692004162Z 2024-07-02 08:40:01,691:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:01.692764799Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:01.891625383Z 2024-07-02 08:40:01,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:01.892453824Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:02.127494338Z 2024-07-02 08:40:02,127:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:02.128283555Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:02.919685207Z 35.191.195.179:34820 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:03.208129691Z 35.191.195.183:36940 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:03.893240198Z 2024-07-02 08:40:03,893:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:03.894008694Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:04.131534741Z 2024-07-02 08:40:04,131:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:04.132323884Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:04.453379554Z 35.191.195.182:46380 - \"GET /health HTTP/1.1\" 200\n2024-07-02T08:40:04.490721297Z 2024-07-02 08:40:04,490:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:04.491480368Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n2024-07-02T08:40:04.891404487Z 2024-07-02 08:40:04,891:INFO:HTTP Request: GET http://producer.default.svc.cluster.local:8080/producer \"HTTP/1.1 200 OK\"\n2024-07-02T08:40:04.892144245Z 86.223.114.39:0 - \"GET /consumer/data HTTP/1.1\" 200\n"
+      },
+      "start": "2024-07-02T08:40:03.856301+00:00",
+      "status": "succeeded",
+      "end": "2024-07-02T08:40:05.244113+00:00",
+      "duration": 1.387812
+    }
+  ],
+  "rollbacks": [],
+  "end": "2024-07-02T08:40:06.392937+00:00",
+  "duration": 42.28331017494202
+}
