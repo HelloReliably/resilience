@@ -884,3 +884,428 @@ HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"F
 [2024-07-02T08:59:49.216108+00:00 DEBUG] [experiment:655] Sending plan '4f239652-dbf6-4dcf-a315-26b4c11a7e4d' status: completed
 [2024-07-02T08:59:49.457305+00:00 DEBUG] [experiment:680] Sending execution state: {'current': 'finished', 'status': 'completed', 'deviated': False, 'plan_id': '4f239652-dbf6-4dcf-a315-26b4c11a7e4d'}
 [2024-07-02T08:59:49.962391+00:00 DEBUG] [caching:42] Clearing activities cache
+[2024-07-02T09:13:59.588769+00:00 INFO] [plan:279] ################################################################################
+[2024-07-02T09:13:59.588922+00:00 INFO] [plan:283] Starting Reliably experiment: https://app.reliably.com/api/v1/organization/8b5fddfd-1da8-4586-934b-f184f0ef7904/experiments/381668ed-eac1-4f4a-8e03-d11b1e5f864c/raw
+[2024-07-02T09:13:59.589043+00:00 DEBUG] [__init__:215] Loading global control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373'
+[2024-07-02T09:13:59.631909+00:00 DEBUG] [__init__:215] Loading global control 'reliably-integration-slack'
+[2024-07-02T09:13:59.836951+00:00 DEBUG] [caching:24] Building activity cache...
+[2024-07-02T09:13:59.837096+00:00 DEBUG] [caching:35] Cached 5 activities
+[2024-07-02T09:13:59.837227+00:00 INFO] [experiment:59] Validating the experiment's syntax
+[2024-07-02T09:13:59.837332+00:00 DEBUG] [configuration:64] Loading configuration...
+[2024-07-02T09:13:59.837525+00:00 DEBUG] [secret:79] Loading secrets...
+[2024-07-02T09:13:59.837600+00:00 DEBUG] [secret:104] Done loading secrets
+[2024-07-02T09:14:00.507722+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'validate_control'
+[2024-07-02T09:14:00.507857+00:00 INFO] [experiment:112] Experiment looks valid
+[2024-07-02T09:14:00.507930+00:00 DEBUG] [caching:42] Clearing activities cache
+[2024-07-02T09:14:00.508029+00:00 DEBUG] [caching:24] Building activity cache...
+[2024-07-02T09:14:00.508129+00:00 DEBUG] [caching:35] Cached 5 activities
+[2024-07-02T09:14:00.508310+00:00 DEBUG] [configuration:64] Loading configuration...
+[2024-07-02T09:14:00.508534+00:00 DEBUG] [secret:79] Loading secrets...
+[2024-07-02T09:14:00.508614+00:00 DEBUG] [secret:104] Done loading secrets
+[2024-07-02T09:14:00.508688+00:00 DEBUG] [configuration:161] Loading dynamic configuration...
+[2024-07-02T09:14:00.508831+00:00 INFO] [run:440] Running experiment: Delete pods labelled app=producer and review impacts
+[2024-07-02T09:14:00.511491+00:00 DEBUG] [run:903] 1 activities will be run in the background
+[2024-07-02T09:14:00.511616+00:00 DEBUG] [__init__:178] Initializing global control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373'
+[2024-07-02T09:14:00.511742+00:00 DEBUG] [python:198] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py'
+[2024-07-02T09:14:00.511894+00:00 DEBUG] [__init__:178] Initializing global control 'reliably-integration-slack'
+[2024-07-02T09:14:00.511974+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'configure_control'
+[2024-07-02T09:14:00.512046+00:00 DEBUG] [__init__:67] Initializing controls
+[2024-07-02T09:14:00.512130+00:00 DEBUG] [__init__:76] Initializing control 'reliably'
+[2024-07-02T09:14:00.512213+00:00 DEBUG] [python:198] Control 'configure_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2024-07-02T09:14:00.512335+00:00 DEBUG] [experiment:476] Configure Reliably's experiment control
+[2024-07-02T09:14:00.513405+00:00 DEBUG] [chatgpt:44] Starting OpenAI GPT conversation in background
+[2024-07-02T09:14:00.513608+00:00 DEBUG] [chatgpt:124] Asking OpenAPI for chat completions using model 'gpt-4o'
+[2024-07-02T09:14:00.513830+00:00 DEBUG] [chatgpt:152] Submitting message to OpenAI
+[2024-07-02T09:14:00.514632+00:00 DEBUG] [experiment:655] Sending plan '4f239652-dbf6-4dcf-a315-26b4c11a7e4d' status: running
+[2024-07-02T09:14:01.144775+00:00 INFO] [experiment:214] Reliably execution: 5017fea0-31c3-4678-b4dc-fa105334da04
+[2024-07-02T09:14:01.394156+00:00 DEBUG] [experiment:680] Sending execution state: {'current': 'running', 'started_on': '2024-07-02T09:14:00.512410+00:00', 'plan_id': '4f239652-dbf6-4dcf-a315-26b4c11a7e4d'}
+[2024-07-02T09:14:01.928959+00:00 DEBUG] [experiment:86] Starting Reliably state checker now
+[2024-07-02T09:14:01.929058+00:00 DEBUG] [__init__:24] Apply 'started' on vendors
+[2024-07-02T09:14:01.929970+00:00 INFO] [run:471] Steady-state strategy: default
+[2024-07-02T09:14:01.930054+00:00 INFO] [run:477] Rollbacks strategy: default
+[2024-07-02T09:14:01.930123+00:00 INFO] [run:485] No steady state hypothesis defined. That's ok, just exploring.
+[2024-07-02T09:14:01.930203+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'experiment'
+[2024-07-02T09:14:01.930561+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_experiment_control'
+[2024-07-02T09:14:01.930657+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'experiment'
+[2024-07-02T09:14:01.930861+00:00 DEBUG] [python:198] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:02.077706+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'experiment'
+[2024-07-02T09:14:02.077864+00:00 DEBUG] [python:198] Control 'before_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2024-07-02T09:14:02.078032+00:00 INFO] [run:778] Playing your experiment's method now...
+[2024-07-02T09:14:02.078148+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'method'
+[2024-07-02T09:14:02.078227+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_method_control'
+[2024-07-02T09:14:02.078293+00:00 DEBUG] [activity:154] activity will run in the background
+[2024-07-02T09:14:02.078645+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:02.078739+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:02.078881+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.078974+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.079057+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:02.079142+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:02.079245+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.079367+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.079469+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:02.079602+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:02.079704+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.079849+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:02.079931+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:02.080038+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:02.080125+00:00 DEBUG] [python:198] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:02.080241+00:00 DEBUG] [python:198] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:02.233453+00:00 INFO] [activity:232] Action: Delete all pods labelled app=producer
+[2024-07-02T09:14:02.275742+00:00 INFO] [activity:226] Action: Run mild traffic into consumer service [in background]
+[2024-07-02T09:14:02.658092+00:00 DEBUG] [python:33] Activity 'Delete all pods labelled app=producer' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/actions.py'
+[2024-07-02T09:14:02.658430+00:00 DEBUG] [__init__:79] Using Kubernetes context 'default' from config '/tmp/tmpfzah0alh/tmp/k8s/kubeconfig'
+[2024-07-02T09:14:02.938344+00:00 DEBUG] [python:33] Activity 'Run mild traffic into consumer service' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py'
+[2024-07-02T09:14:02.974085+00:00 DEBUG] [activity:317] Activity failed
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/actions.py", line 65, in terminate_pods
+    pods = _select_pods(
+           ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/actions.py", line 235, in _select_pods
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '76c33019-61f4-4867-90f8-d8c99c9825de', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:02 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/activity.py", line 310, in run_activity
+    result = run_python_activity(activity, configuration, secrets)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 58, in run_python_activity
+    raise ActivityFailed(
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/actions.py", line 65, in terminate_pods
+    pods = _select_pods(
+           ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/actions.py", line 235, in _select_pods
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '76c33019-61f4-4867-90f8-d8c99c9825de', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:02 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:02.980402+00:00 ERROR] [activity:268]   => failed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '76c33019-61f4-4867-90f8-d8c99c9825de', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:02 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:03.456921+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:03.457070+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:03.457117+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:03.457288+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:03.457353+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:03.457450+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:03.457520+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:03.457606+00:00 DEBUG] [python:198] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:03.900696+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:03.900837+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:03.900913+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:03.900990+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:03.901063+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:03.901146+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:03.901213+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:03.901289+00:00 DEBUG] [python:198] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:04.119884+00:00 INFO] [activity:232] Action: pause-execution
+[2024-07-02T09:14:04.120074+00:00 DEBUG] [experiment:680] Sending execution state: {'current': 'pause', 'plan_id': '4f239652-dbf6-4dcf-a315-26b4c11a7e4d', 'duration': 30}
+[2024-07-02T09:14:04.747800+00:00 DEBUG] [python:33] Activity 'pause-execution' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/pauses.py'
+[2024-07-02T09:14:04.748018+00:00 INFO] [pauses:24] Pausing activity for 30s or until the execution is resumed
+[2024-07-02T09:14:14.070217+00:00 DEBUG] [chatgpt:186] Got a reply from OpenAI
+[2024-07-02T09:14:14.070365+00:00 DEBUG] [chatgpt:189] Finished fetching OpenAI messages in 13.556536436080933s
+[2024-07-02T09:14:34.748354+00:00 INFO] [pauses:27] Resuming execution...
+[2024-07-02T09:14:34.748555+00:00 DEBUG] [activity:262]   => succeeded without any result value
+[2024-07-02T09:14:34.749086+00:00 DEBUG] [experiment:680] Sending execution state: {'current': 'running', 'started_on': '2024-07-02T09:14:00.512410+00:00', 'plan_id': '4f239652-dbf6-4dcf-a315-26b4c11a7e4d'}
+[2024-07-02T09:14:35.330634+00:00 INFO] [experiment:455] No longer paused
+[2024-07-02T09:14:35.731609+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:35.731759+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:35.731809+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:35.731883+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:35.731951+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:35.732021+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:35.732103+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:35.732183+00:00 DEBUG] [python:198] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:36.165637+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:36.165782+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:36.165837+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:36.165909+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:36.165973+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:36.166044+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:36.166107+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:36.166183+00:00 DEBUG] [python:198] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:36.341512+00:00 INFO] [activity:232] Probe: Get logs for producer pods
+[2024-07-02T09:14:36.622263+00:00 DEBUG] [python:33] Activity 'Get logs for producer pods' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py'
+[2024-07-02T09:14:36.622562+00:00 DEBUG] [__init__:79] Using Kubernetes context 'default' from config '/tmp/tmpfzah0alh/tmp/k8s/kubeconfig'
+[2024-07-02T09:14:36.935747+00:00 DEBUG] [activity:317] Activity failed
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py", line 55, in read_pod_logs
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '07e1f09a-f2b6-47c6-ad37-724a9af7f2e8', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:36 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/activity.py", line 310, in run_activity
+    result = run_python_activity(activity, configuration, secrets)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 58, in run_python_activity
+    raise ActivityFailed(
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py", line 55, in read_pod_logs
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '07e1f09a-f2b6-47c6-ad37-724a9af7f2e8', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:36 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:36.938017+00:00 ERROR] [activity:268]   => failed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': '07e1f09a-f2b6-47c6-ad37-724a9af7f2e8', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:36 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:37.365870+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:37.366054+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:37.366142+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:37.366212+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:37.366274+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:37.366339+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:37.366397+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:37.366468+00:00 DEBUG] [python:198] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:38.175340+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:38.175493+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:38.175563+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'activity'
+[2024-07-02T09:14:38.175655+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:38.175717+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:38.175788+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'before_activity_control'
+[2024-07-02T09:14:38.175847+00:00 DEBUG] [__init__:482] Applying before-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:38.175916+00:00 DEBUG] [python:198] Control 'before_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:38.331207+00:00 INFO] [activity:232] Probe: Get logs for consumer pods
+[2024-07-02T09:14:38.810930+00:00 DEBUG] [python:33] Activity 'Get logs for consumer pods' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py'
+[2024-07-02T09:14:38.811280+00:00 DEBUG] [__init__:79] Using Kubernetes context 'default' from config '/tmp/tmpfzah0alh/tmp/k8s/kubeconfig'
+[2024-07-02T09:14:39.113009+00:00 DEBUG] [activity:317] Activity failed
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py", line 55, in read_pod_logs
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': 'f1dc921e-e2ba-420f-a04d-b8468e6d5985', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:39 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/activity.py", line 310, in run_activity
+    result = run_python_activity(activity, configuration, secrets)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 58, in run_python_activity
+    raise ActivityFailed(
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py", line 56, in run_python_activity
+    return func(**arguments)
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosk8s/pod/probes.py", line 55, in read_pod_logs
+    ret = v1.list_namespaced_pod(ns, label_selector=label_selector)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15823, in list_namespaced_pod
+    return self.list_namespaced_pod_with_http_info(namespace, **kwargs)  # noqa: E501
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api/core_v1_api.py", line 15942, in list_namespaced_pod_with_http_info
+    return self.api_client.call_api(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 348, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 180, in __call_api
+    response_data = self.request(
+                    ^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 373, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 244, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 238, in request
+    raise ApiException(http_resp=r)
+chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': 'f1dc921e-e2ba-420f-a04d-b8468e6d5985', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:39 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:39.115212+00:00 ERROR] [activity:268]   => failed: kubernetes.client.exceptions.ApiException: (401)
+Reason: Unauthorized
+HTTP response headers: HTTPHeaderDict({'Audit-Id': 'f1dc921e-e2ba-420f-a04d-b8468e6d5985', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:39 GMT', 'Content-Length': '129'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"Unauthorized","reason":"Unauthorized","code":401}
+[2024-07-02T09:14:39.442895+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:39.443034+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:39.443100+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:14:39.443169+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:39.443238+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:14:39.443305+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2024-07-02T09:14:39.443374+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:14:39.443447+00:00 DEBUG] [python:198] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:14:40.429212+00:00 DEBUG] [run:1044] Waiting for background activities to complete
+[2024-07-02T09:15:03.039148+00:00 DEBUG] [actions:270] oha exit code: 0
+[2024-07-02T09:15:03.039286+00:00 DEBUG] [actions:271] locust stderr: 
+[2024-07-02T09:15:03.039498+00:00 DEBUG] [activity:260]   => succeeded with '{'summary': {'successRate': 1.0, 'total': 60.001710018, 'slowest': 2.990891545, 'fastest': 0.127013605, 'average': 0.3092513715869564, 'requestsPerSec': 10.016381196797644, 'totalData': 93172, 'sizePerRequest': 155, 'sizePerSec': 1552.8224107621133}, 'responseTimeHistogram': {'0.127013605': 1, '0.41340139900000006': 498, '0.6997891930000001': 49, '0.9861769870000001': 17, '1.272564781': 10, '1.558952575': 4, '1.845340369': 8, '2.1317281630000005': 2, '2.4181159570000004': 3, '2.7045037510000003': 4, '2.990891545': 2}, 'latencyPercentiles': {'p10': 0.129403626, 'p25': 0.131040145, 'p50': 0.177782205, 'p75': 0.278201402, 'p90': 0.592833816, 'p95': 1.075638357, 'p99': 2.485171716, 'p99.9': 2.990891545, 'p99.99': 2.990891545}, 'responseTimeHistogramSuccessful': {'0.127013605': 1, '0.41340139900000006': 498, '0.6997891930000001': 49, '0.9861769870000001': 17, '1.272564781': 10, '1.558952575': 4, '1.845340369': 8, '2.1317281630000005': 2, '2.4181159570000004': 3, '2.7045037510000003': 4, '2.990891545': 2}, 'latencyPercentilesSuccessful': {'p10': 0.129403626, 'p25': 0.131040145, 'p50': 0.177782205, 'p75': 0.278201402, 'p90': 0.592833816, 'p95': 1.075638357, 'p99': 2.485171716, 'p99.9': 2.990891545, 'p99.99': 2.990891545}, 'responseTimeHistogramNotSuccessful': {'NaN': 0}, 'latencyPercentilesNotSuccessful': {'p10': None, 'p25': None, 'p50': None, 'p75': None, 'p90': None, 'p95': None, 'p99': None, 'p99.9': None, 'p99.99': None}, 'rps': {'mean': 72.01414449378356, 'stddev': 779.1237653415294, 'max': 16960.363630157386, 'min': 0.9636145394139523, 'percentiles': {'p10': 6.096243666566718, 'p25': 8.963830817159185, 'p50': 10.039172550115385, 'p75': 16.28882192300816, 'p90': 29.274320908208807, 'p95': 111.22817258341226, 'p99': 631.2043442008792, 'p99.9': 16960.363630157386, 'p99.99': 16960.363630157386}}, 'details': {'DNSDialup': {'average': 0.007628806279999999, 'fastest': 0.006420864, 'slowest': 0.013423923}, 'DNSLookup': {'average': 3.0199400000000004e-05, 'fastest': 2.5668e-05, 'slowest': 3.7751e-05}}, 'statusCodeDistribution': {'200': 598}, 'errorDistribution': {'aborted due to deadline': 3}}'
+[2024-07-02T09:15:03.841959+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:15:03.842107+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:15:03.842168+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'activity'
+[2024-07-02T09:15:03.842237+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_activity_control'
+[2024-07-02T09:15:03.842294+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'activity'
+[2024-07-02T09:15:03.842354+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_activity_control'
+[2024-07-02T09:15:03.842412+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'activity'
+[2024-07-02T09:15:03.842478+00:00 DEBUG] [python:198] Control 'after_activity_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:15:04.177073+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'method'
+[2024-07-02T09:15:04.177217+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_method_control'
+[2024-07-02T09:15:04.177316+00:00 INFO] [run:1072] Let's rollback...
+[2024-07-02T09:15:04.177419+00:00 DEBUG] [__init__:482] Applying before-control 'reliably' on 'rollback'
+[2024-07-02T09:15:04.177511+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'before_rollback_control'
+[2024-07-02T09:15:04.177582+00:00 INFO] [rollback:33] No declared rollbacks, let's move on.
+[2024-07-02T09:15:04.177672+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'rollback'
+[2024-07-02T09:15:04.177741+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'after_rollback_control'
+[2024-07-02T09:15:04.177818+00:00 INFO] [run:598] Experiment ended with status: completed
+[2024-07-02T09:15:04.177892+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373' on 'experiment'
+[2024-07-02T09:15:04.177957+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'after_experiment_control'
+[2024-07-02T09:15:04.178013+00:00 DEBUG] [__init__:482] Applying after-control 'reliably-integration-slack' on 'experiment'
+[2024-07-02T09:15:04.178087+00:00 DEBUG] [python:198] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py'
+[2024-07-02T09:15:04.456137+00:00 DEBUG] [__init__:482] Applying after-control 'reliably' on 'experiment'
+[2024-07-02T09:15:04.456287+00:00 DEBUG] [python:198] Control 'after_experiment_control' loaded from '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py'
+[2024-07-02T09:15:04.456540+00:00 DEBUG] [slack:46] Trying to capture the last 2mn of the Slack channel #acme
+[2024-07-02T09:15:04.558773+00:00 DEBUG] [slack:140] Capture Slack messages from #acme
+[2024-07-02T09:15:04.558912+00:00 DEBUG] [slack:142] Fetching the last 300 messages for the past 2mn [2024-07-02 09:13:04.558738+00:00] from channel #acme [C057K7HCV7A]
+[2024-07-02T09:15:04.848520+00:00 DEBUG] [__init__:106] Cleaning up controls
+[2024-07-02T09:15:04.848667+00:00 DEBUG] [__init__:115] Cleaning up control 'reliably'
+[2024-07-02T09:15:04.848749+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/experiment.py' does not declare 'cleanup_control'
+[2024-07-02T09:15:04.848824+00:00 DEBUG] [__init__:278] Cleaning up global control 'reliably-integration-chatgpt-cf0c9f4ff30bfd6bfe072944152d3373'
+[2024-07-02T09:15:04.848897+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/controls/chatgpt.py' does not declare 'cleanup_control'
+[2024-07-02T09:15:04.848972+00:00 DEBUG] [__init__:278] Cleaning up global control 'reliably-integration-slack'
+[2024-07-02T09:15:04.849059+00:00 DEBUG] [python:192] Control module '/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosslack/control.py' does not declare 'cleanup_control'
+[2024-07-02T09:15:04.849142+00:00 INFO] [experiment:272] Finishing Reliably execution...
+[2024-07-02T09:15:04.851180+00:00 DEBUG] [experiment:172] Stopping Reliably state checker now
+[2024-07-02T09:15:04.851347+00:00 DEBUG] [__init__:24] Apply 'finished' on vendors
+[2024-07-02T09:15:04.851440+00:00 INFO] [experiment:292] Finished Reliably execution. Bye!
+[2024-07-02T09:15:04.851535+00:00 DEBUG] [experiment:560] Completing execution '5017fea0-31c3-4678-b4dc-fa105334da04' status: completed
+[2024-07-02T09:15:05.600260+00:00 DEBUG] [experiment:655] Sending plan '4f239652-dbf6-4dcf-a315-26b4c11a7e4d' status: completed
+[2024-07-02T09:15:05.821000+00:00 DEBUG] [experiment:680] Sending execution state: {'current': 'finished', 'status': 'completed', 'deviated': False, 'plan_id': '4f239652-dbf6-4dcf-a315-26b4c11a7e4d'}
+[2024-07-02T09:15:06.487562+00:00 DEBUG] [caching:42] Clearing activities cache

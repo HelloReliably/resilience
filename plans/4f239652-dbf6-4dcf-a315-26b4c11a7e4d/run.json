@@ -1,7 +1,7 @@
 {
   "chaoslib-version": "1.43.2",
   "platform": "Linux-6.5.0-1022-azure-x86_64-with-glibc2.35",
-  "node": "fv-az1247-497",
+  "node": "fv-az520-196",
   "experiment": {
     "tags": [
       "Kubernetes",
@@ -132,16 +132,16 @@
         ],
         "results": [
           {
-            "id": "chatcmpl-9gTdogHhuz14K7IpNbdq6aJgpNv29",
+            "id": "chatcmpl-9gTsIhC0qUwjc51qNwI7JT3Y1KB0F",
             "object": "chat.completion",
-            "created": 1719910744,
+            "created": 1719911642,
             "model": "gpt-4o-2024-05-13",
             "choices": [
               {
                 "index": 0,
                 "message": {
                   "role": "assistant",
-                  "content": "To limit the blast radius of a restarting Kubernetes pod during Chaos Engineering experiments, you can take several steps to ensure that the impact is controlled and does not affect the entire system. Here are some strategies:\n\n1. **Namespace Isolation**:\n   - Use Kubernetes namespaces to isolate the resources. Conduct your experiments in a dedicated namespace to ensure that only the resources within that namespace are affected.\n\n2. **Label and Selector Usage**:\n   - Apply specific labels to the pods you want to target and use label selectors in your Chaos Toolkit experiments to ensure only those pods are impacted.\n\n3. **Pod Disruption Budgets (PDB)**:\n   - Define Pod Disruption Budgets to limit the number of pods that can be disrupted at any given time. This helps maintain a minimum number of available pods during disruptions.\n\n4. **Node Affinity and Taints/Tolerations**:\n   - Use node affinity rules and taints/tolerations to control which nodes your pods can be scheduled on. This can help in isolating the impact to specific nodes.\n\n5. **Service Mesh**:\n   - If you are using a service mesh like Istio or Linkerd, you can leverage its traffic management features to reroute traffic away from the affected pods or services.\n\n6. **Chaos Scope Definition**:\n   - Clearly define the scope of your chaos experiment in the Chaos Toolkit configuration. Specify the exact resources (pods, deployments, etc.) that should be targeted.\n\n7. **Gradual Rollout**:\n   - Instead of restarting all targeted pods at once, gradually roll out the chaos experiment by restarting one pod at a time or in small batches.\n\n8. **Readiness and Liveness Probes**:\n   - Ensure that your applications have proper readiness and liveness probes configured so that Kubernetes can manage unhealthy pods effectively.\n\n9. **Resource Quotas and Limits**:\n   - Set resource quotas and limits on namespaces to control the amount of resources that can be consumed, preventing runaway resource usage during experiments.\n\n10. **Monitoring and Alerts**:\n    - Have robust monitoring and alerting in place to quickly detect any unintended consequences of your chaos experiments and take corrective actions promptly.\n\n### Example Chaos Toolkit Experiment\n\nHere is an example of how you might configure a Chaos Toolkit experiment to restart a specific pod with limited blast radius:\n\n```json\n{\n  \"version\": \"1.0.0\",\n  \"title\": \"Restart a specific Kubernetes pod\",\n  \"description\": \"An experiment to restart a specific pod while limiting blast radius\",\n  \"tags\": [\"kubernetes\", \"pod\", \"restart\"],\n  \"steady-state-hypothesis\": {\n    \"title\": \"Ensure service is healthy\",\n    \"probes\": [\n      {\n        \"type\": \"probe\",\n        \"name\": \"service-is-healthy\",\n        \"tolerance\": true,\n        \"provider\": {\n          \"type\": \"http\",\n          \"timeout\": 2000,\n          \"verify_tls\": false,\n          \"url\": \"http://your-service/health\"\n        }\n      }\n    ]\n  },\n  \"method\": [\n    {\n      \"type\": \"action\",\n      \"name\": \"restart-pod\",\n      \"provider\": {\n        \"type\": \"python\",\n        \"module\": \"chaosk8s.pod.actions\",\n        \"func\": \"delete_pods\",\n        \"arguments\": {\n          \"name_pattern\": \"^your-pod-name$\",\n          \"namespace\": \"your-namespace\"\n        }\n      }\n    }\n  ],\n  \"rollbacks\": []\n}\n```\n\nIn this example, the `delete_pods` action targets a specific pod by name pattern within a specified namespace, ensuring that only this pod is restarted during the experiment.\n\nBy following these strategies, you can effectively limit the blast radius of restarting Kubernetes pods during your Chaos Engineering experiments."
+                  "content": "Limiting the blast radius of a restarting Kubernetes pod is crucial to ensure that the impact of chaos experiments or unexpected failures is contained and does not affect the entire system. Here are some strategies to achieve this:\n\n### 1. Use Namespaces\n- **Isolate Resources:** Deploy your applications in separate namespaces to isolate resources and limit the scope of failures.\n- **Namespace-specific Policies:** Apply network policies, resource quotas, and limits at the namespace level.\n\n### 2. Pod Disruption Budgets (PDB)\n- **Define PDBs:** Create PodDisruptionBudget objects to specify the minimum number of pods that should be available during disruptions.\n```yaml\napiVersion: policy/v1\nkind: PodDisruptionBudget\nmetadata:\n  name: my-app-pdb\nspec:\n  minAvailable: 2\n  selector:\n    matchLabels:\n      app: my-app\n```\n\n### 3. Resource Requests and Limits\n- **Set Resource Limits:** Define resource requests and limits for CPU and memory to prevent a single pod from consuming all resources.\n```yaml\nresources:\n  requests:\n    memory: \"64Mi\"\n    cpu: \"250m\"\n  limits:\n    memory: \"128Mi\"\n    cpu: \"500m\"\n```\n\n### 4. Horizontal Pod Autoscaler (HPA)\n- **Auto-scaling:** Use HPA to automatically scale the number of pods based on resource utilization, ensuring that there are always enough pods to handle traffic.\n```yaml\napiVersion: autoscaling/v1\nkind: HorizontalPodAutoscaler\nmetadata:\n  name: my-app-hpa\nspec:\n  scaleTargetRef:\n    apiVersion: apps/v1\n    kind: Deployment\n    name: my-app\n  minReplicas: 2\n  maxReplicas: 10\n  targetCPUUtilizationPercentage: 50\n```\n\n### 5. Circuit Breakers and Rate Limiting\n- **Service Mesh:** Implement circuit breakers and rate limiting using a service mesh like Istio or Linkerd to prevent cascading failures.\n```yaml\napiVersion: networking.istio.io/v1alpha3\nkind: DestinationRule\nmetadata:\n  name: my-app-destination-rule\nspec:\n  host: my-app.default.svc.cluster.local\n  trafficPolicy:\n    outlierDetection:\n      consecutiveErrors: 5\n      interval: 5m\n      baseEjectionTime: 15m\n      maxEjectionPercent: 50\n```\n\n### 6. Chaos Engineering Tools Configuration (Chaos Toolkit)\n- **Scope Definition:** When using Chaos Toolkit, define a narrow scope for your experiments.\n```json\n{\n    \"title\": \"Restart a specific pod\",\n    \"description\": \"Restart a specific pod in a controlled manner\",\n    \"tags\": [\"kubernetes\", \"pod\"],\n    \"steady-state-hypothesis\": {\n        \"title\": \"Application is healthy\",\n        \"probes\": [\n            {\n                \"type\": \"probe\",\n                \"name\": \"check_pod_status\",\n                \"tolerance\": true,\n                \"provider\": {\n                    \"type\": \"python\",\n                    \"module\": \"chaosk8s.pod.probes\",\n                    \"func\": \"pod_is_not_evicted\",\n                    \"arguments\": {\n                        \"name\": \"my-app-pod\",\n                        \"namespace\": \"my-namespace\"\n                    }\n                }\n            }\n        ]\n    },\n    \"method\": [\n        {\n            \"type\": \"action\",\n            \"name\": \"restart_pod\",\n            \"provider\": {\n                \"type\": \"python\",\n                \"module\": \"chaosk8s.pod.actions\",\n                \"func\": \"terminate_pods\",\n                \"arguments\": {\n                    \"name_pattern\": \"^my-app-pod$\",\n                    \"namespace\": \"my-namespace\"\n                }\n            }\n        }\n    ]\n}\n```\n\n### 7. Monitoring and Alerts\n- **Set Up Monitoring:** Use tools like Prometheus, Grafana, and Alertmanager to monitor your cluster and set up alerts for unusual behavior.\n\nBy implementing these strategies, you can effectively limit the blast radius of a restarting Kubernetes pod, ensuring that your system remains resilient and reliable."
                 },
                 "logprobs": null,
                 "finish_reason": "stop"
@@ -149,10 +149,10 @@
             ],
             "usage": {
               "prompt_tokens": 92,
-              "completion_tokens": 777,
-              "total_tokens": 869
+              "completion_tokens": 859,
+              "total_tokens": 951
             },
-            "system_fingerprint": "fp_ce0793330f"
+            "system_fingerprint": "fp_d576307f90"
           }
         ]
       },
@@ -1073,13 +1073,13 @@
         "pauses": [
           {
             "before_activity": "pause-execution",
-            "start": "2024-07-02T08:59:10.397452+00:00",
+            "start": "2024-07-02T09:14:04.340242+00:00",
             "duration": 30,
-            "end": "2024-07-02T08:59:40.945753+00:00"
+            "end": "2024-07-02T09:14:34.749037+00:00"
           }
         ],
         "termination": null,
-        "execution_url": "https://app.reliably.com/executions/view/?id=c84d1f29-e3c4-4323-b056-3a185d78f784&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c",
+        "execution_url": "https://app.reliably.com/executions/view/?id=5017fea0-31c3-4678-b4dc-fa105334da04&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c",
         "extra": [
           {
             "type": "url",
@@ -1097,7 +1097,7 @@
             "type": "url",
             "provider": "github",
             "topic": "run",
-            "value": "https://github.com/HelloReliably/resilience/actions/runs/9757986478"
+            "value": "https://github.com/HelloReliably/resilience/actions/runs/9758224953"
           }
         ],
         "chaostoolkit_extensions": [
@@ -1120,10 +1120,10 @@
                   {
                     "user": "U03A1BN3RDX",
                     "type": "message",
-                    "ts": "1719910746.257869",
+                    "ts": "1719911642.046959",
                     "edited": {
                       "user": "B039NNX8GRH",
-                      "ts": "1719910787.000000"
+                      "ts": "1719911704.000000"
                     },
                     "bot_id": "B039NNX8GRH",
                     "app_id": "A039KSG18TX",
@@ -1142,10 +1142,10 @@
                       },
                       "team_id": "T1FBR1CTW"
                     },
-                    "thread_ts": "1719910746.257869",
-                    "reply_count": 11,
+                    "thread_ts": "1719911642.046959",
+                    "reply_count": 10,
                     "reply_users_count": 1,
-                    "latest_reply": "1719910787.568149",
+                    "latest_reply": "1719911704.390799",
                     "reply_users": [
                       "U03A1BN3RDX"
                     ],
@@ -1157,7 +1157,7 @@
                         "blocks": [
                           {
                             "type": "section",
-                            "block_id": "oiSs2",
+                            "block_id": "GlcpK",
                             "text": {
                               "type": "mrkdwn",
                               "text": "*Delete pods labelled app=producer and review impacts*",
@@ -1166,11 +1166,11 @@
                           },
                           {
                             "type": "context",
-                            "block_id": "7H6m0",
+                            "block_id": "ljKTu",
                             "elements": [
                               {
                                 "type": "mrkdwn",
-                                "text": "*Host:* fv-az1247-497\n*State:* Completed successfully",
+                                "text": "*Host:* fv-az520-196\n*State:* Completed successfully",
                                 "verbatim": false
                               }
                             ]
@@ -1183,7 +1183,7 @@
                     "blocks": [
                       {
                         "type": "rich_text",
-                        "block_id": "xP3",
+                        "block_id": "DQUYQ",
                         "elements": [
                           {
                             "type": "rich_text_section",
@@ -1402,7 +1402,7 @@
         "env_var_type": "str"
       },
       "slack_extra": [
-        "<https://app.reliably.com/executions/view/?id=c84d1f29-e3c4-4323-b056-3a185d78f784&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c|View Reliably Execution>"
+        "<https://app.reliably.com/executions/view/?id=5017fea0-31c3-4678-b4dc-fa105334da04&exp=381668ed-eac1-4f4a-8e03-d11b1e5f864c|View Reliably Execution>"
       ]
     },
     "contributions": {
@@ -1416,7 +1416,7 @@
       "probes": []
     }
   },
-  "start": "2024-07-02T08:59:03.814603+00:00",
+  "start": "2024-07-02T09:14:00.511463+00:00",
   "status": "completed",
   "deviated": false,
   "steady_states": {
@@ -1447,7 +1447,7 @@
         "background": false
       },
       "output": null,
-      "start": "2024-07-02T08:59:06.592619+00:00",
+      "start": "2024-07-02T09:14:02.233592+00:00",
       "status": "failed",
       "exception": [
         "Traceback (most recent call last):\n",
@@ -1461,12 +1461,12 @@
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py\", line 373, in request\n    return self.rest_client.GET(url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 244, in GET\n    return self.request(\"GET\", url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 238, in request\n    raise ApiException(http_resp=r)\n",
-        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '30b0bcc6-967e-4a05-b401-b2eb70796767', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:07 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
+        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '76c33019-61f4-4867-90f8-d8c99c9825de', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:02 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
         "\nDuring handling of the above exception, another exception occurred:\n\n",
-        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '30b0bcc6-967e-4a05-b401-b2eb70796767', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:07 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
+        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '76c33019-61f4-4867-90f8-d8c99c9825de', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:02 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
       ],
-      "end": "2024-07-02T08:59:07.803091+00:00",
-      "duration": 1.210472
+      "end": "2024-07-02T09:14:02.980705+00:00",
+      "duration": 0.747113
     },
     {
       "activity": {
@@ -1491,19 +1491,120 @@
         },
         "background": true
       },
-      "output": null,
-      "start": "2024-07-02T08:59:06.607497+00:00",
-      "status": "failed",
-      "exception": [
-        "Traceback (most recent call last):\n",
-        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaoslib/provider/python.py\", line 56, in run_python_activity\n    return func(**arguments)\n           ^^^^^^^^^^^^^^^^^\n",
-        "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/chaosreliably/activities/load/actions.py\", line 205, in run_load_test\n    raise ActivityFailed(\"missing load test dependency\")\n",
-        "chaoslib.exceptions.ActivityFailed: missing load test dependency\n",
-        "\nDuring handling of the above exception, another exception occurred:\n\n",
-        "chaoslib.exceptions.ActivityFailed: chaoslib.exceptions.ActivityFailed: missing load test dependency\n"
-      ],
-      "end": "2024-07-02T08:59:07.341795+00:00",
-      "duration": 0.734298
+      "output": {
+        "summary": {
+          "successRate": 1.0,
+          "total": 60.001710018,
+          "slowest": 2.990891545,
+          "fastest": 0.127013605,
+          "average": 0.3092513715869564,
+          "requestsPerSec": 10.016381196797644,
+          "totalData": 93172,
+          "sizePerRequest": 155,
+          "sizePerSec": 1552.8224107621133
+        },
+        "responseTimeHistogram": {
+          "0.127013605": 1,
+          "0.41340139900000006": 498,
+          "0.6997891930000001": 49,
+          "0.9861769870000001": 17,
+          "1.272564781": 10,
+          "1.558952575": 4,
+          "1.845340369": 8,
+          "2.1317281630000005": 2,
+          "2.4181159570000004": 3,
+          "2.7045037510000003": 4,
+          "2.990891545": 2
+        },
+        "latencyPercentiles": {
+          "p10": 0.129403626,
+          "p25": 0.131040145,
+          "p50": 0.177782205,
+          "p75": 0.278201402,
+          "p90": 0.592833816,
+          "p95": 1.075638357,
+          "p99": 2.485171716,
+          "p99.9": 2.990891545,
+          "p99.99": 2.990891545
+        },
+        "responseTimeHistogramSuccessful": {
+          "0.127013605": 1,
+          "0.41340139900000006": 498,
+          "0.6997891930000001": 49,
+          "0.9861769870000001": 17,
+          "1.272564781": 10,
+          "1.558952575": 4,
+          "1.845340369": 8,
+          "2.1317281630000005": 2,
+          "2.4181159570000004": 3,
+          "2.7045037510000003": 4,
+          "2.990891545": 2
+        },
+        "latencyPercentilesSuccessful": {
+          "p10": 0.129403626,
+          "p25": 0.131040145,
+          "p50": 0.177782205,
+          "p75": 0.278201402,
+          "p90": 0.592833816,
+          "p95": 1.075638357,
+          "p99": 2.485171716,
+          "p99.9": 2.990891545,
+          "p99.99": 2.990891545
+        },
+        "responseTimeHistogramNotSuccessful": {
+          "NaN": 0
+        },
+        "latencyPercentilesNotSuccessful": {
+          "p10": null,
+          "p25": null,
+          "p50": null,
+          "p75": null,
+          "p90": null,
+          "p95": null,
+          "p99": null,
+          "p99.9": null,
+          "p99.99": null
+        },
+        "rps": {
+          "mean": 72.01414449378356,
+          "stddev": 779.1237653415294,
+          "max": 16960.363630157386,
+          "min": 0.9636145394139523,
+          "percentiles": {
+            "p10": 6.096243666566718,
+            "p25": 8.963830817159185,
+            "p50": 10.039172550115385,
+            "p75": 16.28882192300816,
+            "p90": 29.274320908208807,
+            "p95": 111.22817258341226,
+            "p99": 631.2043442008792,
+            "p99.9": 16960.363630157386,
+            "p99.99": 16960.363630157386
+          }
+        },
+        "details": {
+          "DNSDialup": {
+            "average": 0.007628806279999999,
+            "fastest": 0.006420864,
+            "slowest": 0.013423923
+          },
+          "DNSLookup": {
+            "average": 0.000030199400000000004,
+            "fastest": 0.000025668,
+            "slowest": 0.000037751
+          }
+        },
+        "statusCodeDistribution": {
+          "200": 598
+        },
+        "errorDistribution": {
+          "aborted due to deadline": 3
+        }
+      },
+      "start": "2024-07-02T09:14:02.275861+00:00",
+      "status": "succeeded",
+      "end": "2024-07-02T09:15:03.039560+00:00",
+      "duration": 60.763699
     },
     {
       "activity": {
@@ -1519,10 +1620,10 @@
         }
       },
       "output": null,
-      "start": "2024-07-02T08:59:09.653033+00:00",
+      "start": "2024-07-02T09:14:04.120019+00:00",
       "status": "succeeded",
-      "end": "2024-07-02T08:59:40.945728+00:00",
-      "duration": 31.292695
+      "end": "2024-07-02T09:14:34.749018+00:00",
+      "duration": 30.628999
     },
     {
       "activity": {
@@ -1542,7 +1643,7 @@
         }
       },
       "output": null,
-      "start": "2024-07-02T08:59:42.763921+00:00",
+      "start": "2024-07-02T09:14:36.341639+00:00",
       "status": "failed",
       "exception": [
         "Traceback (most recent call last):\n",
@@ -1555,12 +1656,12 @@
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py\", line 373, in request\n    return self.rest_client.GET(url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 244, in GET\n    return self.request(\"GET\", url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 238, in request\n    raise ApiException(http_resp=r)\n",
-        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '7ae912f6-bc10-4c76-9ba3-96d7f3264397', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:43 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
+        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '07e1f09a-f2b6-47c6-ad37-724a9af7f2e8', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:36 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
         "\nDuring handling of the above exception, another exception occurred:\n\n",
-        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '7ae912f6-bc10-4c76-9ba3-96d7f3264397', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:43 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
+        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '07e1f09a-f2b6-47c6-ad37-724a9af7f2e8', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:36 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
       ],
-      "end": "2024-07-02T08:59:43.772523+00:00",
-      "duration": 1.008602
+      "end": "2024-07-02T09:14:36.938460+00:00",
+      "duration": 0.596821
     },
     {
       "activity": {
@@ -1580,7 +1681,7 @@
         }
       },
       "output": null,
-      "start": "2024-07-02T08:59:45.040266+00:00",
+      "start": "2024-07-02T09:14:38.331339+00:00",
       "status": "failed",
       "exception": [
         "Traceback (most recent call last):\n",
@@ -1593,15 +1694,15 @@
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/api_client.py\", line 373, in request\n    return self.rest_client.GET(url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 244, in GET\n    return self.request(\"GET\", url,\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n",
         "  File \"/home/runner/work/resilience/resilience/.venv/lib/python3.11/site-packages/kubernetes/client/rest.py\", line 238, in request\n    raise ApiException(http_resp=r)\n",
-        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '67305ce1-6435-427c-a1ac-9dd1011adf29', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:46 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
+        "kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': 'f1dc921e-e2ba-420f-a04d-b8468e6d5985', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:39 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n\n\n",
         "\nDuring handling of the above exception, another exception occurred:\n\n",
-        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': '67305ce1-6435-427c-a1ac-9dd1011adf29', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 08:59:46 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
+        "chaoslib.exceptions.ActivityFailed: kubernetes.client.exceptions.ApiException: (401)\nReason: Unauthorized\nHTTP response headers: HTTPHeaderDict({'Audit-Id': 'f1dc921e-e2ba-420f-a04d-b8468e6d5985', 'Cache-Control': 'no-cache, private', 'Content-Type': 'application/json', 'Date': 'Tue, 02 Jul 2024 09:14:39 GMT', 'Content-Length': '129'})\nHTTP response body: {\"kind\":\"Status\",\"apiVersion\":\"v1\",\"metadata\":{},\"status\":\"Failure\",\"message\":\"Unauthorized\",\"reason\":\"Unauthorized\",\"code\":401}\n"
       ],
-      "end": "2024-07-02T08:59:46.174465+00:00",
-      "duration": 1.134199
+      "end": "2024-07-02T09:14:39.115538+00:00",
+      "duration": 0.784199
     }
   ],
   "rollbacks": [],
-  "end": "2024-07-02T08:59:47.221478+00:00",
-  "duration": 43.409393548965454
+  "end": "2024-07-02T09:15:04.177799+00:00",
+  "duration": 63.66890501976013
 }
